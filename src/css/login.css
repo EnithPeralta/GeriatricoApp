@@ -1,0 +1,262 @@
+:root {
+    --primary-color: #33B0D7;
+    --secondary-color: #D0D0D0;
+    --light-color: #ECECEC;
+    --text-dark: #3D3D3D;
+    --text-gray: #888;
+    --text-light: #666;
+    --bg-light: #D9D9D9;
+    --bg-input: #E9E9E9;
+    --shadow-main: rgba(0, 0, 0, 0.2);
+    --shadow-subtle: rgba(0, 0, 0, 0.1);
+  }
+  body{
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif; 
+  }
+  
+  .BodyLogin {
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background: var(--bg-light); 
+  }
+  
+  .cuadrado {
+    background: linear-gradient(var(--light-color), var(--secondary-color));
+    width: 40vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    z-index: 1;
+    overflow: hidden;
+  }
+  
+  .circlebottom {
+    background: linear-gradient(to right, #2C93B3, var(--primary-color));
+    border-radius: 50%;
+    width: 29rem;
+    height: 24rem;
+    position: absolute;
+    bottom: -7rem;
+    left: -14.5rem;
+    box-shadow:
+      -30px -15px 30px 5px rgba(255, 255, 255, 0.527),
+      30px 15px 36px 12px #6b6b6b58,
+      inset 15px 15px 25px 10px #0000003a,
+      inset -15px -15px 45px 15px #ffffff68;
+  }
+  
+  .circletop {
+    background: linear-gradient(to right, #2C93B3, var(--primary-color));
+    border-radius: 50%;
+    width: 31rem;
+    height: 31rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(200px, -50%);
+    box-shadow:
+      -30px -15px 30px 5px rgba(255, 255, 255, 0.527),
+      30px 15px 30px 15px #0000004c,
+      inset 15px 15px 25px 10px #0000003a,
+      inset -15px -15px 45px 15px #ffffff68;
+  }
+  
+  .web {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    padding: 10px;
+  }
+  
+  .circle {
+    color: #0090BC;
+  }
+  
+  .title {
+    color: #BDBDBD;
+  }
+  
+  h3 {
+    position: absolute;
+    top: 100px;
+    left: 50px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    color: #919191;
+    padding: 10px;
+  }
+  
+  h2 {
+    position: absolute;
+    top: 140px;
+    left: 50px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 40px;
+    color: var(--text-dark);
+    padding: 10px;
+  }
+  
+  .p {
+    position: absolute;
+    top: 220px;
+    left: 50px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 20px;
+    color: #919191;
+    padding: 10px;
+  }
+  
+  .link {
+    text-decoration: none;
+    color: #0090BC;
+  }
+  
+  /* Estilo general del formulario */
+  .form {
+    position: absolute;
+    width: 300px;
+    margin: 0 auto;
+    padding: 10px;
+    top: 276px;
+    left: 50px;
+  }
+  
+  /* Contenedor de cada campo de entrada */
+  .input-container {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+  }
+  
+  .input-container i {
+    color: var(--text-dark);
+    margin-left: 10px;
+    font-size: 18px;
+  }
+  
+  .input-container input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+  }
+  
+  /* Botón de enviar */
+  button {
+    width: 50%;
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 20px auto;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Efecto hover para el botón */
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Ajustes para dispositivos de tamaño medio (tabletas) */
+  @media (max-width: 48em) {
+    .cuadrado {
+      width: 80vw;
+    }
+  
+    .circlebottom,
+    .circletop {
+      width: 18rem;
+      height: 18rem;
+    }
+  
+    .web {
+      margin: 30px;
+      font-size: 18px;
+    }
+  
+    h3, h2, p {
+      font-size: 18px;
+    }
+  
+    .form {
+      width: 80%;
+      top: 320px;
+      left: 10px;
+    }
+  
+    button {
+      width: 80%;
+    }
+  }
+  
+  /* Ajustes para dispositivos pequeños (teléfonos móviles) */
+  @media (max-width: 25em) {
+    .cuadrado {
+      width: 90vw;
+    }
+  
+    .circlebottom,
+    .circletop {
+      width: 15rem;
+      height: 15rem;
+    }
+  
+    .web {
+      font-size: 16px;
+    }
+  
+    h3, h2, p {
+      font-size: 16px;
+    }
+  
+    .form {
+      width: 90%;
+      top: 350px;
+      left: 5%;
+    }
+  
+    button {
+      width: 90%;
+    }
+  }
+  
+  .img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 35%;
+    height: auto;
+    transform: translate(-20%, -50%);
+  }
+  
+  
