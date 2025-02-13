@@ -1,0 +1,126 @@
+/* Fondo oscuro para el modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);  /* Un poco más oscuro para un contraste más fuerte */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Para asegurarte de que el modal esté sobre otros elementos */
+    transition: opacity 0.3s ease; /* Transición suave */
+}
+/* Contenedor del contenido del modal */
+.modal-content {
+    background: white;
+    padding: 0 30px 30px 30px; /* Elimina padding arriba y mantiene los demás lados */
+    border-radius: 10px; /* Bordes más redondeados */
+    width: 80%;  /* Hacer el modal más flexible */
+    max-width: 350px;  /* Tamaño máximo */
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);  /* Sombra más difusa */
+    text-align: center;
+    animation: modal-in 0.5s ease-out;  /* Efecto de animación */
+}
+
+.modal-title{
+    position: absolute;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #333;
+    position: sticky;
+    display: flex;
+    align-items: center;
+    font-size: 30px;
+    justify-content: center;
+    display: flex;
+}
+/* Animación para el modal */
+@keyframes modal-in {
+    0% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Contenedor de los botones dentro del modal */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+}
+
+/* Estilos para el botón de guardar */
+.btn-save {
+    background: #28a745;
+    color: white;
+    padding: 12px 20px;  /* Un poco más grande */
+    border: none;
+    border-radius: 5px;  /* Bordes más suaves */
+    cursor: pointer;
+    transition: background 0.3s;  /* Efecto de transición */
+}
+
+.btn-save:hover {
+    background: #0056b3;  /* Cambio de color al pasar el mouse */
+}
+
+/* Estilos para el botón de cancelar */
+.btn-cancel {
+    background: #dc3545;
+    color: white;
+    padding: 12px 20px;  /* Un poco más grande */
+    border: none;
+    border-radius: 5px;  /* Bordes más suaves */
+    cursor: pointer;
+    transition: background 0.3s;  /* Efecto de transición */
+}
+
+.btn-cancel:hover {
+    background: #0056b3;  /* Cambio de color al pasar el mouse */
+}
+
+/* Etiquetas dentro del formulario */
+.modal-label {
+    margin-bottom: 10px;  /* Menos espacio entre la etiqueta y el .modal-input */
+    font-weight: bold;
+    color: #495057;
+    text-transform: capitalize;
+}
+
+/* .modal-inputs dentro del formulario */
+.modal-input[type="text"],
+.modal-input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal-img{
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.modal-input[type="text"]:focus,
+.modal-input[type="email"]:focus {
+    outline: none;
+    border-color: #28a745;  /* Resaltar el borde cuando está enfocado */
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.2);  /* Efecto visual al hacer foco */
+}
+
+/* Para mejorar la accesibilidad y asegurar el diseño */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 90%;  /* Ajustar el tamaño en pantallas pequeñas */
+        min-width: 300px;  /* Asegurar que no sea demasiado pequeño */
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

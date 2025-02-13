@@ -10,11 +10,6 @@
     --shadow-main: rgba(0, 0, 0, 0.2);
     --shadow-subtle: rgba(0, 0, 0, 0.1);
   }
-  body{
-    margin: 0;
-    padding: 0;
-    font-family: 'Poppins', sans-serif; 
-  }
   
   .BodyLogin {
     position: relative;
@@ -40,7 +35,7 @@
   .circlebottom {
     background: linear-gradient(to right, #2C93B3, var(--primary-color));
     border-radius: 50%;
-    width: 29rem;
+    width: 25rem;
     height: 24rem;
     position: absolute;
     bottom: -7rem;
@@ -55,8 +50,8 @@
   .circletop {
     background: linear-gradient(to right, #2C93B3, var(--primary-color));
     border-radius: 50%;
-    width: 31rem;
-    height: 31rem;
+    width: 30rem;
+    height: 30rem;
     position: absolute;
     top: 0;
     right: 0;
@@ -72,7 +67,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    margin: 50px;
+    margin: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -91,8 +86,8 @@
   
   h3 {
     position: absolute;
-    top: 100px;
-    left: 50px;
+    top: 50px;
+    left: 60px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -103,8 +98,8 @@
   
   h2 {
     position: absolute;
-    top: 140px;
-    left: 50px;
+    top: 75px;
+    left: 60px;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -112,18 +107,23 @@
     color: var(--text-dark);
     padding: 10px;
   }
-  
-  .p {
-    position: absolute;
-    top: 220px;
-    left: 50px;
+
+  .p{
+    position: static;
+    left: 80px;
     display: flex;
     align-items: center;
+    justify-content: end;
     gap: 5px;
-    font-size: 20px;
-    color: #919191;
+    font-size: 15px;
+    color: #0090BC;
     padding: 10px;
+    text-decoration: underline;
   }
+  .p:hover {
+    color: #0056b3;
+  }
+  
   
   .link {
     text-decoration: none;
@@ -136,8 +136,8 @@
     width: 300px;
     margin: 0 auto;
     padding: 10px;
-    top: 276px;
-    left: 50px;
+    top: 190px;
+    left: 60px;
   }
   
   /* Contenedor de cada campo de entrada */
@@ -167,7 +167,7 @@
   
   /* Botón de enviar */
   button {
-    width: 50%;
+    width: 90%;
     padding: 10px;
     background-color: var(--primary-color);
     color: #fff;

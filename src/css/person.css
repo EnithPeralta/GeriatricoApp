@@ -1,0 +1,134 @@
+.container-person {
+    /* background-image: url('/Bg.jpg'); */
+    background: linear-gradient(#009ee2, #00b0ff);
+    background-size: cover;
+    min-height: 100vh;
+    padding: 15px 60px;
+    position: relative;
+}
+
+.content-person {
+    width: 90%;
+    background: #e9e9e9;
+    padding: 20px;
+    margin: 2.7rem auto; /* Centrado automático */
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    transition: transform 0.3s;
+}
+.card-person{
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    margin: 10px auto;  
+    height: 100px;
+    justify-content: space-between;     
+}
+.card-person:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-person:hover .actions {
+    opacity: 1;  /* Mostramos cuando el cursor esté sobre la tarjeta */
+}
+.title-person {
+    margin: 0;             
+    font-size: 24px;   
+    position: absolute;
+}
+
+.title-add{
+    display: flex;         /* Usa flexbox */
+    align-items: center;   /* Alinea elementos verticalmente */
+    justify-content: space-between; /* Espacia los elementos */
+    width: 100%;           /* Ocupa el ancho completo */
+    margin-bottom: 20px;   /* Espacio inferior */
+}
+
+.add-person{
+    display: flex;
+    align-items: end;
+    margin-left: 850px;
+    max-width: 250px;      /* Ajusta el ancho del input */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out; /* Suaviza la transición de color */
+    cursor: pointer;
+}
+
+
+.sede-card-person:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+    
+.sede-card-person:active {
+    border: 2px solid #4BB6C2;
+}
+    
+.sede-icon-person {
+    background-color: #e3e3e3c2;
+    padding: 12px;
+    border-radius: 50px;
+    margin-right: 30px;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.person-img{
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+    
+.fas  {
+    font-size: 100px;
+    color: #666;
+    margin-right: 10px;
+}
+
+.sede-info-person {
+    flex-grow: 1;
+}
+
+.delete-button-person, .add-button-person {
+    background-color: #4BB6C2;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px 5px 30px;
+    transition: background-color 0.2s;
+}
+
+.add-button-person:hover {
+    background-color: #3a9ba7;
+}
+
+.delete-button-person { background: red; }
+.delete-button-person:hover { background: #6f6f6f; }

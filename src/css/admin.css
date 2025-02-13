@@ -117,9 +117,10 @@ margin-left: -25px;
 }
 
 .building-title{
-    left: 29rem;
-    padding: 33px;
+    left: 25rem;
+    padding: 100px;
     color: white;
+    position: absolute;
 }
 
 .buttons-group {
@@ -154,17 +155,17 @@ margin-left: -25px;
 }
 
 .button-outline:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .button-filled {
-    background-color: white;
-    color: #2564ebfc;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 3px solid rgb(249, 249, 249);
     margin-top: 120px;
     width: 180px;
     z-index: 1;
-    
-
 }
 
 .button-filled:hover {
@@ -221,8 +222,9 @@ margin-left: -25px;
     font-weight: 600;
     margin-left: 110px;
     text-align: center;
-    position: relative;
-    top: -30px;
+    position: absolute;
+    top: -20px;
+    left: 100px;
 }
 
 .stat-number {
@@ -231,45 +233,45 @@ margin-left: -25px;
     color: #3d3d3d;
     margin-left: 220px;
     position: relative;
-    top: -30px;
+    top: -15px;
 }
 
 .add-button {
     position: absolute;
-    top: 120px;
-    left:200px;
     background-color: #B1D3EF;
     padding: 8px 16px;
     border-radius: 10px;
     border: 3px solid #3d3d3d;
     color: #3d3d3d;
-    display: flex;
-    align-items: center;
     gap: 6px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    width: 180px;
+    margin-top: 10px;
+    top: 130px;
+    left: 235px;    
 }
-
 .stat2-info h3 {
     color: #E9E9E9;
     font-size: 23px;
     margin-bottom: 0px;
     font-weight: 600;
-    margin-left: 65px;
+    margin-left: 110px;
     text-align: center;
-    position: relative;
+    position: absolute;
     top: -20px;
+    left: 100px;
 }
 
 .stat2-number {
     font-size: 40px;
     font-weight: 600;
     color: #E9E9E9;
-    margin-left: 170px;
+    margin-left: 220px;
     position: relative;
-    top: -20px;
+    top: -15px;
 }
 
 .add2-button {
@@ -288,6 +290,10 @@ margin-left: -25px;
     background-color: rgba(255, 255, 255, 0.1);
     color: white;
     border: 3px solid rgb(249, 249, 249);
+    width: 180px;
+    margin-top: 10px;
+    top: 130px;
+    left: 235px;    
 }
 
 .add-button:hover {
@@ -313,6 +319,7 @@ margin-left: -25px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     width: 200PX;
     text-align: center;
+    cursor: pointer;
 }
 
 .user-avatar {
@@ -326,3 +333,20 @@ margin-left: -25px;
     color: #3d3d3d;
 }
 
+.picture {
+    width: 40px; /* Ajusta el tamaño del contenedor */
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden; /* Para asegurarse de que la imagen no sobresalga */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ddd; /* Fondo por si no hay imagen */
+}
+
+.admin-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
