@@ -69,7 +69,7 @@ export const ResetPassword = () => {
               ></i>
             </div>
 
-            <button className="btn" type="submit" disabled={loading}>
+            <button className="btn-forget" type="submit" disabled={loading}>
               {loading ? "Restableciendo..." : "Enviar"}
             </button>
 

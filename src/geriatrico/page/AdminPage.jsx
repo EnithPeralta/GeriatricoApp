@@ -28,6 +28,8 @@ export const AdminPage = () => {
         fetchPersona();
     }, [getAuthenticatedPersona]);
 
+    
+
     return (
         <div className="bodyAdmin">
             <div className="headerAdmin">
@@ -53,7 +55,7 @@ export const AdminPage = () => {
                         <div className="building-content">
                             <h2 className="building-title">Lorem ipsum dolor sit amet.</h2>
                             <div className="buttons-group">
-                                <button className="button button-outline" onClick={() => navigate("/geriatrico/page")}>
+                                <button className="button button-outline" onClick={() => navigate("/geriatrico/geriatricoActive")}>
                                     <i className="fa-solid fa-plus"></i> Crear Geriatrico
                                 </button>
                                 <button className="button button-filled" onClick={() => navigate("/geriatrico/roles")}>
@@ -66,8 +68,8 @@ export const AdminPage = () => {
 
                     <div className="stat-card">
                         <div className="stat-info">
-                            <h3>Personal médico</h3>
-                            <div className="stat-number">40+</div>
+                            <h3>Personas Registradas</h3>
+                                {/* <div className="stat-number">40+</div> */}
                         </div>
                         <button className="add-button" onClick={() => navigate("/register")}>
                             <i className="fa-solid fa-plus"></i> Agregar
@@ -76,12 +78,11 @@ export const AdminPage = () => {
 
                     <div className="stat2-card">
                         <div className="stat-info">
-                            <h3>Pacientes</h3>
-                            <div className="stat-number">240+</div>
+                            <h3>Gestiornar Personas</h3>
                         </div>
                         <div className="button-group">
-                            <button className="add-button">
-                                <i className="fa-solid fa-plus"></i> Agregar
+                            <button className="add-button" onClick={() => navigate("/geriatrico/personas")}>
+                            <i className="fa-solid fa-street-view"></i> Ver Personas
                             </button>
                         </div>
                     </div>

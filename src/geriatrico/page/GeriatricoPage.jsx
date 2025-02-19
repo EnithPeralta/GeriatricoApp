@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useGeriatrico } from "../../hooks/useGeriatrico";
 import { CargandoComponent, ModalCrearGeriatrico, ModalEditarGeriatrico, ModalGeriatrico } from "../components";
 import { GoBackButton } from "../components/GoBackButton";
+import Swal from "sweetalert2";
 import '../../css/geriatrico.css';
+import { useNavigate } from "react-router-dom";
 
 export const GeriatricosPage = () => {
-    const { obtenerGeriatricos, crearGeriatrico, actualizarGeriatrico } = useGeriatrico();
+    const navigate = useNavigate();
+    const { obtenerGeriatricosActive, crearGeriatrico, actualizarGeriatrico, inactivarGeriatrico } = useGeriatrico();
     const [geriatricos, setGeriatricos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,14 +21,14 @@ export const GeriatricosPage = () => {
     useEffect(() => {
         const fetchGeriatricos = async () => {
             try {
-                const result = await obtenerGeriatricos();
+                const result = await obtenerGeriatricosActive();
                 if (result.success) {
                     setGeriatricos(result.geriatricos);
                 } else {
                     setError(result.message);
                 }
             } catch (error) {
-                setError("Error al obtener los geriátricos",error);
+                setError("Error al obtener los geriátricos", error);
             } finally {
                 setLoading(false);
             }
@@ -49,7 +52,6 @@ export const GeriatricosPage = () => {
         setSelectedGeriatrico(geriatrico);
         setIsEditModalOpen(true);
     };
-
 
     const handleSaveGeriatrico = async (nuevoGeriatrico) => {
         const result = await crearGeriatrico(nuevoGeriatrico);
@@ -80,6 +82,24 @@ export const GeriatricosPage = () => {
         }
     };
 
+    const handleInactivarGeriatrico = async (ge_id) => {
+        const confirm = await Swal.fire({
+            text: "¿Estás seguro de que deseas inactivar este geriátrico?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, Inactivar",
+            cancelButtonText: "Cancelar"
+        });
+        if (confirm.isConfirmed) {
+            const result = await inactivarGeriatrico(ge_id);
+            if (result.success) {
+                Swal.fire("Inactivado", "El geriátrico ha sido inactivado correctamente.", "success");
+                setGeriatricos((prev) => prev.filter(g => g.ge_id !== ge_id)); // Remueve el geriátrico de la lista
+            } else {
+                Swal.fire("Error", result.message, "error");
+            }
+        }
+    };
 
     if (loading) return <CargandoComponent />;
     if (error) return <p className="error">{error}</p>;
@@ -93,8 +113,11 @@ export const GeriatricosPage = () => {
         <div className="container-geriatrico">
             <GoBackButton />
             <div className="content-geriatrico">
-                <div className="title-input">
-                    <h1 className="title">Lista de Geriátricos</h1>
+                <div className="titulo-input">
+                    <h1 className="titulo">Lista de Geriátricos</h1>
+                    <button className="button-geriatrico" onClick={() => navigate("/geriatrico/geriatricoInactive")}>
+                        Geriatricos Inactivos
+                    </button>
                     <input
                         type="text"
                         placeholder="Buscar por nombre o NIT..."
@@ -115,12 +138,22 @@ export const GeriatricosPage = () => {
                                         <span className="color-box" style={{ backgroundColor: geriatrico.ge_color_secundario }}></span>
                                         <span className="color-box" style={{ backgroundColor: geriatrico.ge_color_terciario }}></span>
                                     </div>
-                                    <img src={geriatrico.ge_logo} alt="Logo" className="geriatrico-logo" />
+                                    <img
+                                        src={geriatrico.ge_logo || "/public/Admin.jpg"}
+                                        alt="Logo"
+                                        className="geriatrico-logo"
+                                        onError={(e) => { e.target.src = "/public/Admin.jpg"; }}
+                                    />
+
                                     <button className="details-button" onClick={() => handleViewDetails(geriatrico)}>Ver Detalles</button>
                                     <div className="actions">
-                                        <button className="delete-button">
-                                            <i className="fas fa-trash-alt" />
+                                        <button
+                                            className={`toggle-button ${geriatrico.ge_activo ? 'active' : 'inactive'}`}
+                                            onClick={() => handleInactivarGeriatrico(geriatrico.ge_id)}
+                                        >
+                                            <i className={`fas ${geriatrico.ge_activo ? 'fa-toggle-on' : 'fa-toggle-off'}`} />
                                         </button>
+
                                         <button className="edit-button" onClick={() => handleEditGeriatrico(geriatrico)}>
                                             <i className="fas fa-edit" />
                                         </button>
@@ -133,7 +166,7 @@ export const GeriatricosPage = () => {
                     )}
                     <div className="card" onClick={() => setIsCreateModalOpen(true)}>
                         <div className="card-content-i">
-                                <i className="fas fa-plus" />
+                            <i className="fas fa-plus" />
                             <p>Crear Geriatrico</p>
                         </div>
                     </div>

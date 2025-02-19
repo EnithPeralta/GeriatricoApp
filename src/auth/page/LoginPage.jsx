@@ -65,7 +65,7 @@ export const LoginPage = () => {
             />
           </div>
           <button type="submit">Entrar</button>
-          <Link to={"/auth/forgotPassword"}>
+          <Link className="link" to={"/forgotPassword"}>
             <p className="p">¿Se te ha olvidado la contraseña?</p>
           </Link>
         </form>

@@ -16,7 +16,6 @@ export const RegisterPage = () => {
                     <FaCircle className="circle" />
                     <span className="title">Geriátrico Web</span>
                 </div>
-
                 <div className="seccion-titulo">
                     <h1>Registrarse<span>.</span></h1>
                     <p className="subtitulo">Comienza ahora</p>

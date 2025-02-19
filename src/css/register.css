@@ -100,6 +100,13 @@
     gap: 25px;
 }
 
+.input-grid-container{
+    padding-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
 .input-container-register {
     background: var(--bg-input);
     padding: 15px 20px;
@@ -142,13 +149,13 @@
     background: var(--primary-color);
     color: white;
     border: none;
-    padding: 12px 35px;
+    align-items: center;
     border-radius: 12px;
-    font-size: 1em;
+    font-size: 1rem;
     cursor: pointer;
     margin-top: 20px;
-    float: right;
     box-shadow: 0 4px 15px rgba(75, 181, 195, 0.3);
+    width: 35%;
 }
 
 .register{
@@ -161,9 +168,18 @@
     align-items: center;
     gap: 5px;
     font-size: 20px;
-    padding: 10px;
+    padding: 15px 20px;
   }
-
+.custom-select-container{
+    width: 100%;
+    display: flex;
+    padding: 7px;
+    margin: 5px ;
+    font-size: 13px;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #333;
+}
 /* Estilos específicos para pantallas móviles */
 @media (max-width: 768px) {
     .BodyLogin {

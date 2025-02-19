@@ -6,3 +6,4 @@ export * from './HomePage';
 export * from './ProfilePage';
 export * from './GeriatricoPage';
 export * from './RolesPage';
+export * from './GeriatricoInactivoPage';

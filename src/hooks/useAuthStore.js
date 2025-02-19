@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import geriatricoApi from "../api/geriatricoApi";
-import { clearErrorMessage, onChecking, onLogin, onLogout } from "../store/auth/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../helpers/getToken";
+import { onChecking, onLogin, onLogout, clearErrorMessage } from "../store/auth/authSlice";
+import { persistor } from "../store/store";
 
 export const useAuthStore = () => {
     const { status, user, errorMessage } = useSelector(state => state.auth);
@@ -22,9 +23,9 @@ export const useAuthStore = () => {
 
             // Guardar datos en el estado global
             dispatch(onLogin({
-                per_usuario: data.persona.per_usuario,
-                per_nombre_completo: data.persona.nombre_completo,
-                per_telefono: data.persona.per_telefono,
+                per_usuario: data.persona.usuario,
+                per_nombre_completo: data.persona.nombre,
+                per_telefono: data.persona.telefono,
                 esSuperAdmin: data.persona.esSuperAdmin,
                 token: data.token,
             }));
@@ -104,13 +105,22 @@ export const useAuthStore = () => {
         dispatch(onLogin({ token })); // ✅ Usuario sigue autenticado
     };
 
+
     const startLogout = () => {
+        // Limpiar items del localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('token-init-date');
-        dispatch(onLogout()); // Cambia el estado a "no autenticado"
-        navigate('/auth/login'); // Redirige al login al cerrar sesión
+        
+        // Limpiar todos los datos persistidos de Redux
+        persistor.purge(); // Limpia los datos persistidos de Redux
+    
+        // Cambia el estado a "no autenticado"
+        dispatch(onLogout());
+    
+        // Redirige al login
+        navigate('/auth/login');
     };
-
+    
     return {
         /*Propiedades*/
         status,

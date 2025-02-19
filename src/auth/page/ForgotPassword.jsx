@@ -30,7 +30,7 @@ export const ForgotPassword = () => {
                         <i className="fas fa-envelope" />
                     </div>
                     <button
-                        className="btn"
+                        className="btn-forget"
                         onClick={handleSubmit}  // Llamamos a la función handleSubmit cuando se hace click
                         disabled={loading}  // Deshabilitamos el botón mientras se procesa la solicitud
                     >

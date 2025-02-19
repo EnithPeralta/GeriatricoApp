@@ -60,8 +60,11 @@ export const RolesPage = () => {
                   <span className="rol-description">{rol.rol_descripcion}</span>
                 </div>
                 <div className="actions-rol">
-                  <button className="delete-button-rol">
-                    <i className="fas fa-trash-alt" />
+                  <button
+                    className={`toggle-button  ? 'active' : 'inactive'}`}
+                    // onClick={() => handleInactivarGeriatrico(geriatrico.ge_id)}
+                  >
+                    <i className={`fas ? 'fa-toggle-on' : 'fa-toggle-off'}`} />
                   </button>
                   <button
                     className="edit-button"
@@ -86,7 +89,7 @@ export const RolesPage = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Modal para crear un nuevo rol */}
       <ModalCrearRol
         isOpen={isCreateModalOpen}

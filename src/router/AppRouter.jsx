@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { useAuthStore } from "../hooks/useAuthStore";
-import { RegisterPage, ResetPassword } from "../auth/page";
+import { ForgotPassword, RegisterPage, ResetPassword } from "../auth/page";
 import { AuthRoutes } from "../auth/routes/AuthRoutes";
 import { GeriatricoRoutes } from "../geriatrico/routes/GeriatricoRoutes";
 import { useEffect } from "react";
@@ -20,6 +20,8 @@ export const AppRouter = () => {
   return (
     <Routes>
       <Route path="/restablecerPassword/:token" element={<ResetPassword />} />
+      <Route path="/forgotPassword" element={<ForgotPassword />} />
+
 
       {status === "authenticated" ? (
         <>

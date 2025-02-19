@@ -5,7 +5,7 @@ export const geriatricoSlice = createSlice({
     initialState: {
         isSaving: false,
         message: '',
-        geriatrico: null,
+        geriatrico: [],
         error: null,
     },
     reducers: {
@@ -17,7 +17,7 @@ export const geriatricoSlice = createSlice({
         saveGeriatricoSuccess: (state, action) => {
             state.isSaving = false;
             state.message = action.payload.message;
-            state.geriatrico = action.payload;
+            state.geriatrico = action.payload.geriatrico || [];
         },
         saveGeriatricoFailure: (state, action) => {
             state.isSaving = false;
@@ -32,5 +32,5 @@ export const geriatricoSlice = createSlice({
     }
 });
 
-export const { startSavingGeriatrico, saveGeriatricoSuccess, saveGeriatricoFailure, clearGeriatricoState } = geriatricoSlice.actions;
+export const { startSavingGeriatrico, saveGeriatricoSuccess, saveGeriatricoFailure, clearGeriatricoState, setGeriatricoSeleccionado } = geriatricoSlice.actions;
 

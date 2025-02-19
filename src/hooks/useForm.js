@@ -33,13 +33,15 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     // Función para manejar cambios en los campos del formulario.
     // Actualiza el valor del campo correspondiente en el estado `formState`.
     const onInputChange = ({ target }) => {
-        const { name, value } = target; // Obtiene el nombre y el valor del campo que cambió.
-        setFormState({
-            ...formState, // Copia el estado actual.
-            [name]: value // Actualiza el campo específico.
-        });
+        const { name, type, value, files } = target;
+    
+        setFormState((prevState) => ({
+            ...prevState,
+            [name]: type === "file" ? files[0] : name === "rol_id" ? Number(value) : value
+        }));
     };
-
+    
+    
     // Función para reiniciar el formulario a su estado inicial.
     const onResetForm = () => {
         setFormState(initialForm);
