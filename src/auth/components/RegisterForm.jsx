@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
-import { useAuthStore, useForm } from '../../hooks';
+import { useEffect, useRef, useState } from 'react';
+import { useAuthStore, useForm, usePersona, useSession } from '../../hooks';
 import Swal from 'sweetalert2';
 import { InputField } from './InputField/InputField';
-import { useNavigate } from 'react-router-dom';  // Importar useNavigate
+import { useNavigate } from 'react-router-dom';
+import { useGeriatricoPersona } from '../../hooks/useGeriatricoPersona';
 
 const registerFormFields = {
     per_password: '',
@@ -18,7 +19,26 @@ const registerFormFields = {
 
 export const RegisterForm = () => {
     const { startRegister, errorMessage } = useAuthStore();
-    const navigate = useNavigate(); // Hook de navegación
+    const { obtenerSesion } = useSession();
+    const navigate = useNavigate();
+    const [esSuperAdmin, setEsSuperAdmin] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { buscarVincularPersona } = usePersona()
+    const { vincularPersonaAGeriatrico } = useGeriatricoPersona();
+
+    const fetchedRef = useRef(false);
+
+    useEffect(() => {
+        if (!fetchedRef.current) {
+            const fetchSesion = async () => {
+                const sesion = await obtenerSesion();
+                console.log("Sesion obtenida:", sesion);
+                setEsSuperAdmin(sesion?.esSuperAdmin || false);
+            };
+            fetchSesion();
+            fetchedRef.current = true;
+        }
+    }, [obtenerSesion]);
 
     const {
         per_password,
@@ -41,6 +61,39 @@ export const RegisterForm = () => {
         }
     }, [errorMessage]);
 
+    const buscarPersona = async () => {
+        if (!per_documento.trim()) return;
+
+        setLoading(true);
+        const sesion = await obtenerSesion();
+        const ge_id = sesion?.ge_id;
+
+        const resultado = await buscarVincularPersona({ documento: per_documento, ge_id });
+
+        setLoading(false);
+
+        if (resultado.success) {
+            if (resultado.action === "none") {
+                Swal.fire({ icon: 'info', text: resultado.message });
+            } else if (resultado.action === "link") {
+                Swal.fire({
+                    icon: 'question',
+                    text: resultado.message,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, vincular',
+                    cancelButtonText: 'No'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await vincularPersonaAGeriatrico(resultado.per_id, ge_id);
+                        Swal.fire({ icon: 'success', text: 'Persona vinculada exitosamente' });
+                    }
+                });
+            }
+        } else {
+            Swal.fire({ icon: 'error', text: resultado.message });
+        }
+    };
+
     const registroSubmit = async (e) => {
         e.preventDefault();
 
@@ -61,14 +114,13 @@ export const RegisterForm = () => {
                 per_foto
             });
 
-            // Mostrar alerta de éxito
             Swal.fire({
                 icon: 'success',
                 text: 'La cuenta ha sido creada correctamente',
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {
-                navigate('/geriatrico/gestionar'); // Redirigir después de la alerta
+                navigate('/geriatrico/asignar');
             });
 
         } catch (error) {
@@ -79,10 +131,25 @@ export const RegisterForm = () => {
 
     return (
         <form className="form-container" onSubmit={registroSubmit}>
+            {!esSuperAdmin && (
+                <div className="search-container-asignar">
+                    <input
+                        type="text"
+                        className="search-input-asignar"
+                        placeholder="Buscar por Cédula..."
+                        name="per_documento"
+                        value={per_documento}
+                        onChange={onInputChange}
+                        onBlur={buscarPersona} // Dispara la búsqueda al salir del campo
+                    />
+                    <button type="button" className="search-button-buscar" onClick={buscarPersona} disabled={loading}>
+                        <i className={`fas fa-search ${loading ? 'fa-spin' : ''}`} />
+                    </button>
+                </div>
+            )}
             <div className="input-grid">
                 <InputField label="Nombre completo" type="text" name="per_nombre_completo" value={per_nombre_completo} onChange={onInputChange} placeholder="Juan Gomez" icon="fas fa-user" required />
                 <InputField label="E-mail" type="email" name="per_correo" value={per_correo} onChange={onInputChange} placeholder="correo@example.com" icon="fas fa-envelope" required />
-                <InputField label="C.C" type="text" name="per_documento" value={per_documento} onChange={onInputChange} placeholder="106168102" icon="fas fa-id-card" required />
                 <InputField label="Usuario" type="text" name="per_usuario" value={per_usuario} onChange={onInputChange} placeholder="juangomez" icon="fas fa-user" required />
                 <InputField label="Contraseña" type={isPasswordVisible ? "text" : "password"} name="per_password" value={per_password} onChange={onInputChange} placeholder="••••••••" icon={`fa-solid ${isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'}`} onClick={togglePasswordVisibility} required />
                 <InputField label="Confirmar Contraseña" type={isPasswordVisible ? "text" : "password"} name="confirm_password" value={confirm_password} onChange={onInputChange} placeholder="••••••••" icon={`fa-solid ${isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'}`} onClick={togglePasswordVisibility} required />

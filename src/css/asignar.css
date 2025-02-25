@@ -1,0 +1,281 @@
+/* Estilo general de la página */
+.bodyAsignar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('/Bg.jpg') no-repeat center center/cover;
+    padding: 20px;
+}
+
+/* Contenedor principal */
+/* Ajustar el tamaño del contenedor principal */
+.container-asignar {
+    width: 90%;
+    max-width: 1500px;
+    background: #e9e9e9;
+    padding: 20px;
+    border-radius: 20px 20px 0px 0px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 80vh; /* Ahora ocupa el 80% de la pantalla */
+    display: flex;
+    flex-direction: column;
+    margin: auto; /* Centrado */
+}
+
+/* Ajustar el contenido interno */
+.content-asignar {
+    background-color: rgb(226, 226, 226);
+    border-radius: 20px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    height: 100%; /* Ajustado para que ocupe toda la altura disponible */
+    width: 100%;
+    padding: 10px 0px ;
+}
+
+/* Título */
+.title-asignar {
+    position:  absolute;
+    top: 66px;
+    left: 135px;
+    color: #333;
+    font-size: 30px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+/* Barra de búsqueda */
+.search-bar-asignar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 75rem;
+    gap: 10px;
+    margin-top: 50px;
+}
+
+.search-input-asignar {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.search-button-asignar {
+    background-color: #009ee2;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 150px;
+}
+
+.search-button-asignar:hover {
+    background-color: #007bb5;
+}
+
+/* Tarjeta de usuario */
+.sede-card-asignar {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    width: 115ch;
+    height: 100q;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.sede-card-asignar:hover {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.select-geriatrico{
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+} 
+.fas{
+    font-size: 20px;
+}
+
+.sede-info {
+    flex: 1;
+}
+
+.full-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #009ee2;
+}
+
+.CC {
+    font-size: 16px;
+    color: #666;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
+
+.add-button-asignar,
+.edit-button-asignar,
+.inactive-button-asignar
+ {
+    background-color: #009ee2;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+.inactive-button-asignar{
+    background-color: #df0016;
+}
+.edit-button-asignar {
+    background-color: #2daa3d;
+}
+
+.add-button-asignar:hover {
+    background-color: #007bb5;
+}
+
+.edit-button-asignar:hover {
+    background-color: #0d470a;
+}
+
+.inactive-button-asignar:hover{
+    background-color: #af1625;
+}
+
+.asignar-button{
+    background-color: #009ee2;
+    color: white;
+    border: none;
+    width: 100px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: #f9f9f9;
+min-width: 160px;
+box-shadow: 0px 9px 18px rgba(0, 0, 0, 0.214);
+z-index: 1;
+border-radius: 5px;
+}
+
+.dropdown-content-geriatrico option {
+color: #3d3d3d;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+transition: background-color 0.3s ease; 
+}
+
+.dropdown-content-geriatrico option:hover {
+background-color: #ddd; 
+}
+
+.date-input{
+    width: 50%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.dropdown:hover .dropdown-content-geriatrico {
+display: block; /* Mostrar contenido del dropdown al pasar el mouse */
+}
+.dropdown-button-geriatrico{
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    
+}
+
+.asignar-img{
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+
+
+/* Estilos del modal
+.modal-container {
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    z-index: 1000; /* Asegura que esté por encima de otros elementos 
+    width: 300px; /* Ajusta según el diseño 
+}
+  
+  .form-asignar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .btn-guardar {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .btn-cerrar {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+   */

@@ -2,6 +2,8 @@ import geriatricoApi from "../api/geriatricoApi";
 import { getToken } from "../helpers/getToken";
 
 export const useGeriatricoPersonaRol = () => {
+
+  // Función para asignar un rol a un geriatrico
   const asignarRolGeriatrico = async ({ per_id, ge_id, rol_id, gp_fecha_inicio, gp_fecha_fin }) => {
     console.log("Datos enviados para asignar rol:", { per_id, ge_id, rol_id, gp_fecha_inicio, gp_fecha_fin });
 

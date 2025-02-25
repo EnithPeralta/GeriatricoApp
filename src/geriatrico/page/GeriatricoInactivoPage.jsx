@@ -6,7 +6,7 @@ import { GoBackButton } from "../components/GoBackButton";
 import Swal from "sweetalert2"; // Importamos SweetAlert2 para las alertas
 
 export const GeriatricoInactivoPage = () => {
-    const { obtenerGeriatricosInactivos, actualizarGeriatrico, reactivarGeriatrico } = useGeriatrico();
+    const { obtenerGeriatricosInactivos, reactivarGeriatrico } = useGeriatrico();
     const [geriatricoInactive, setGeriatricoInactive] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

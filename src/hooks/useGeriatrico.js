@@ -272,7 +272,6 @@ export const useGeriatrico = () => {
         }
     };
 
-
     const reactivarGeriatrico = async (ge_id) => {
         dispatch(startSavingGeriatrico()); // Iniciar la carga
         console.log("Intentando reactivar geriátrico con ID:", ge_id);
@@ -374,7 +373,6 @@ export const useGeriatrico = () => {
         }
     };
 
-
     const limpiarEstadoGeriatrico = () => {
         dispatch(clearGeriatricoState());
     };
@@ -431,6 +429,38 @@ export const useGeriatrico = () => {
         }
     };
 
-
-    return { crearGeriatrico, obtenerGeriatricosActive, obtenerGeriatricos, limpiarEstadoGeriatrico, actualizarGeriatrico, obtenerGeriatricosInactivos, reactivarGeriatrico, inactivarGeriatrico, homeMiGeriatrico };
+    const obtenerColoresGeriatrico = async (ge_id) => {
+        const token = getToken();
+    
+        if (!token) {
+            return {
+                success: false,
+                message: "No hay token disponible",
+                colores: null
+            };
+        }
+    
+        try {
+            const { data } = await geriatricoApi.get(`/geriatricos/${ge_id}/colores`, {
+                headers: {
+                    Authorization: `Bearer ${token}`, // Agregar token en los headers
+                }
+            });
+    
+            return {
+                success: true,
+                colores: data.colores
+            };
+        } catch (error) {
+            console.error('Error al obtener colores:', error);
+    
+            return {
+                success: false,
+                message: error.response?.data?.message || "Error al obtener colores del geriátrico",
+                colores: null
+            };
+        }
+    };
+    
+    return { crearGeriatrico, obtenerGeriatricosActive, obtenerGeriatricos, limpiarEstadoGeriatrico, actualizarGeriatrico, obtenerGeriatricosInactivos, reactivarGeriatrico, inactivarGeriatrico, homeMiGeriatrico, obtenerColoresGeriatrico };
 };

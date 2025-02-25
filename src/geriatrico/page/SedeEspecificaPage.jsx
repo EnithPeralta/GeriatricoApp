@@ -41,7 +41,6 @@ export const SedeEspecificaPage = () => {
                             <div className="pacientes">COLABORADORES</div>
                         </div>
 
-
                     </div>
                     <div className="sede-card active">
                         <div className="sede-icon">

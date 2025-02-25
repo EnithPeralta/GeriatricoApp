@@ -1,6 +1,6 @@
 export interface SelectFieldProps {
-    label:string;
+    label: string;
     name: string;
-    value: string; 
-    onChange: VoidFunction;
+    value: string;
+    onChange: (selectedRoles: string[]) => void; // Ahora acepta un array de roles
 }

@@ -124,67 +124,74 @@ export const useRoles = () => {
         }
     };
     const seleccionarRol = async ({ rol_id, se_id, ge_id }) => {
-        const rolIdNum = Number(rol_id);  // Convierte a número
-        const geIdNum = ge_id ? Number(ge_id) : undefined;  // Convierte a número si ge_id existe
-        const seIdNum = se_id? Number(se_id) : undefined;  // Convierte a número si se_id existe
-    
+        const rolIdNum = Number(rol_id); // Convertir a número
+        const geIdNum = ge_id ? Number(ge_id) : undefined; // Convertir si existe
+        const seIdNum = se_id ? Number(se_id) : undefined; // Convertir si existe
+
         console.log("🟢 Recibidos:", { rolIdNum, seIdNum, geIdNum });
-    
+
         dispatch(startSeleccion());
-    
+
         const token = getToken();
         console.log("🔑 Token utilizado:", token);
-    
+
         if (!token) {
             const errorMessage = "Token de autenticación no encontrado";
             dispatch(setRolError(errorMessage));
             return { success: false, message: errorMessage };
         }
-    
+
         if (!rolIdNum || (!seIdNum && !geIdNum)) {
             const errorMessage = "Debe seleccionar un rol y una sede o geriátrico.";
             dispatch(setRolError(errorMessage));
             return { success: false, message: errorMessage };
         }
-    
+
         if (seIdNum && geIdNum) {
             const errorMessage = "Debe seleccionar solo una sede o geriátrico, no ambos.";
             dispatch(setRolError(errorMessage));
             return { success: false, message: errorMessage };
         }
-    
+
         try {
             const payload = {
                 rol_id: rolIdNum,
-                ...(seIdNum ? { se_id } : {}),
+                ...(seIdNum ? { se_id: seIdNum } : {}),
                 ...(geIdNum ? { ge_id: geIdNum } : {}),
             };
-    
+
             console.log("📤 Payload final:", payload);
-    
+
             const { data } = await geriatricoApi.post(
                 "/roles/rolSeleccionado",
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-    
-            console.log("✅ Respuesta exitosa:", data);
-            console.log(data.ge_id);
 
-            // Guardar en Redux
-            dispatch(setRolSeleccionado({ rol_id: rolIdNum, se_id: seIdNum, ge_id: geIdNum }));
-    
+            console.log("✅ Respuesta exitosa:", data);
+
+            if (data.ge_id) {
+                console.log("📌 Guardando ge_id:", data.ge_id);
+
+                // Guardar en Redux
+                dispatch(setRolSeleccionado({ rol_id: rolIdNum, se_id: seIdNum, ge_id: data.ge_id }));
+
+                // Guardar en localStorage para persistencia
+                localStorage.setItem("ge_id", data.ge_id);
+                localStorage.setItem("rol_id", data.rol_id);
+            }
+
             return { success: true, message: data.message, data };
         } catch (error) {
             console.error("❌ Error en la petición:", error);
-    
-            const errorMessage = error.response?.data?.errors[0]?.msg || "Error al seleccionar rol";
+
+            const errorMessage = error.response?.data?.errors?.[0]?.msg || "Error al seleccionar rol";
             dispatch(setRolError(errorMessage));
-    
+
             return { success: false, message: errorMessage };
         }
     };
-    
+
     // const seleccionarRol = async ({ rol_id, se_id, ge_id }) => {
     //     console.log("🟢 Recibidos:", { rol_id, se_id, ge_id });
 

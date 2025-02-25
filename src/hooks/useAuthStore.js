@@ -110,6 +110,9 @@ export const useAuthStore = () => {
         // Limpiar items del localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('token-init-date');
+        localStorage.removeItem('session');
+        localStorage.removeItem('rol_id');
+        localStorage.removeItem('ge_id');
         
         // Limpiar todos los datos persistidos de Redux
         persistor.purge(); // Limpia los datos persistidos de Redux

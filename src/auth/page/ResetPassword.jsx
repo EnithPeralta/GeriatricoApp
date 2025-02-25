@@ -1,7 +1,8 @@
 import '../../css/forge.css';
 import { useState } from "react";
 import { usePassword } from "../../hooks/usePassword";
-import { useParams } from "react-router-dom";  // Para obtener el token de la URL
+import { useParams } from "react-router-dom";  
+import Swal from 'sweetalert2';
 
 export const ResetPassword = () => {
   const { resetPassword, loading, message, error } = usePassword();
@@ -30,7 +31,10 @@ export const ResetPassword = () => {
 
     const response = await resetPassword(token, form.per_password, form.confirmPassword);
     if (response) {
-      alert("Contraseña restablecida correctamente.");
+      Swal.fire({
+        icon: 'success',
+        text: 'La contraseña se ha restablecido correctamente.',
+      })
     }
   };
 

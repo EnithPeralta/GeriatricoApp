@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { FaCircle } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom"; // ✅ Importar useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import "../../css/login.css";
-import { useAuthStore, useForm } from "../../hooks";
+import { useAuthStore, useForm, useSession } from "../../hooks";
 
 const loginFormFields = {
   per_password: '',
@@ -10,24 +11,29 @@ const loginFormFields = {
 
 export const LoginPage = () => {
   const { startLogin } = useAuthStore();
-  const navigate = useNavigate(); // ✅ Hook para redirección
+  const navigate = useNavigate();
   const { per_password, per_usuario, onInputChange, isPasswordVisible, togglePasswordVisibility } = useForm(loginFormFields);
+  const { session, obtenerSesion } = useSession(); 
+
+  useEffect(() => {
+    // Si ya hay una sesión almacenada, redirigir directamente
+    if (session) {
+      navigate(session.esSuperAdmin ? "/geriatrico/superAdmin" : "/geriatrico/home");
+    }
+  }, [session, navigate]);
 
   const loginSubmit = async (e) => {
     e.preventDefault();
-    
+
     const { success, esSuperAdmin } = await startLogin({ per_usuario, per_password });
 
     if (success) {
-        if (esSuperAdmin) {
-            navigate("/geriatrico/admin"); // ✅ Redirige a la página del admin
-        } else {
-            navigate("/geriatrico/home"); // ✅ Redirige a la página normal
-        }
+        await obtenerSesion(); // Se obtiene la sesión después del login
+        navigate(esSuperAdmin ? "/geriatrico/superAdmin" : "/geriatrico/home");
     } else {
         alert("Usuario o contraseña incorrectos");
     }
-};
+  };
 
   return (
     <div className="BodyLogin">
@@ -38,11 +44,9 @@ export const LoginPage = () => {
           <FaCircle className="circle" />
           <span className="title">Geriátrico Web</span>
         </div>
-        <h3>comienza ahora</h3>
-        <h2>
-          Iniciar sesión
-          <span className="link">.</span>
-        </h2>
+        <h3>Comienza ahora</h3>
+        <h2>Iniciar sesión<span className="link">.</span></h2>
+
         <form className="form" onSubmit={loginSubmit}>
           <div className="input-container">
             <i className="fas fa-user"></i>
@@ -69,6 +73,7 @@ export const LoginPage = () => {
             <p className="p">¿Se te ha olvidado la contraseña?</p>
           </Link>
         </form>
+
         <div className="circlebottom"></div>
       </div>
     </div>

@@ -9,43 +9,53 @@ import "../../css/home.css";
 export const HomePage = () => {
     const { getAuthenticatedPersona } = usePersona();
     const { startLogout } = useAuthStore();
-    const [persona, setPersona] = useState(null);
-
-    const navigate = useNavigate();
     const { seleccionarRol } = useRoles();
+    const navigate = useNavigate();
+    const [persona, setPersona] = useState(null);
 
     // Obtiene el rol seleccionado desde Redux
     const rolSeleccionado = useSelector((state) => state.roles?.rolSeleccionado ?? null);
 
     useEffect(() => {
         const fetchPersona = async () => {
-            if (!persona) {  // Solo obtener la persona si no está cargada
-                try {
-                    const result = await getAuthenticatedPersona();
-                    if (result.success) {
-                        setPersona(result.persona);
-                    } else {
-                        console.error("Error al obtener persona:", result.message);
-                        setPersona(null);
-                    }
-                } catch (error) {
-                    console.error("Error en la solicitud:", error.message);
+            try {
+                const result = await getAuthenticatedPersona();
+                if (result.success) {
+                    setPersona(result.persona);
+                } else {
+                    console.error("Error al obtener persona:", result.message);
                     setPersona(null);
                 }
+            } catch (error) {
+                console.error("Error en la solicitud:", error.message);
+                setPersona(null);
             }
         };
-        fetchPersona();
-    }, [getAuthenticatedPersona, persona]);  // Dependemos de persona para evitar recargar
 
+        fetchPersona();
+    }, []); // Se ejecuta solo una vez al montar el componente
+    
     useEffect(() => {
-        // Solo redirige si el rolSeleccionado tiene el valor esperado
-        if (rolSeleccionado) {
-            console.log("🎯 Redirigiendo según el rol...");
-            if (rolSeleccionado.rol_id === 2) {
+        if (!rolSeleccionado) return; // No hacer nada si aún no está definido
+    
+        console.log("🎯 Verificando rol seleccionado:", rolSeleccionado);
+    
+        switch (rolSeleccionado.rol_id) {
+            case 2:
+                console.log("🔀 Redirigiendo a /geriatrico/sedes...");
                 navigate(`/geriatrico/sedes`);
-            }
+                break;
+            case 3:
+                console.log("🔀 Redirigiendo a /geriatrico/sedeEspecifica...");
+                navigate(`/geriatrico/sedeEspecifica`);
+                break;
+            default:
+                console.log("ℹ️ No hay redirección para este rol:", rolSeleccionado.rol_id);
+                break;
         }
-    }, [rolSeleccionado, navigate]); // Redirige solo si el rol cambia
+    }, [rolSeleccionado, navigate]);
+    
+
 
     const handleRolChange = async (event) => {
         const selectedOption = event.target.selectedOptions[0];
@@ -54,43 +64,69 @@ export const HomePage = () => {
 
         console.log("Rol seleccionado:", rolId, geId);
 
-        // Solo hacer el dispatch si el rol realmente cambió
-        if (rolId && rolSeleccionado?.rol_id !== rolId) {
+        if (rolId && rolId !== String(rolSeleccionado?.rol_id)) {
             await seleccionarRol({ rol_id: rolId, ge_id: geId });
         }
     };
 
     return (
-        <div>
-            <nav className="navbar" id='Inicio'>
-                <h1 className="logo-home">Bienvenido {persona?.nombre}</h1>
-                <ul className="nav-links">
-                    <div className='user-home' onClick={() => navigate("/geriatrico/profile")}>
-                        <div className="picture">
-                            {persona?.foto ? (
-                                <img src={persona.foto} alt="Foto Del Admin" className="admin-img" />
-                            ) : (
-                                <i className="fas fa-user-circle"></i>
-                            )}
+        <div className="bodyHome">
+            <nav className="navbar" id="Inicio">
+                <div className="navbar-container">
+                    <img src="/logoF.png" alt="Logo" width="200" height="80" />
+                    <SelectRol
+                        label="Rol"
+                        name="rol_id"
+                        value={rolSeleccionado?.rol_id || ""}
+                        onChange={handleRolChange}
+                    />
+                    <div className="space"></div>
+                    <ul className="nav-links">
+                        <div className="user-home" onClick={() => navigate("/geriatrico/profile")}>
+                            <div className="picture">
+                                {persona?.foto ? (
+                                    <img src={persona.foto} alt="Foto Del Admin" className="admin-img" />
+                                ) : (
+                                    <i className="fas fa-user-circle"></i>
+                                )}
+                            </div>
+                        </div>
+                        <div className="change-password" onClick={() => navigate("/forgotPassword")}>
+                            <i className="fa-solid fa-lock" />
+                            <p className="change-password-text">Cambiar clave</p>
+                        </div>
+                        <button onClick={startLogout} className="btn-logout">
+                            <i className="fa-solid fa-right-from-bracket" />
+                        </button>
+                    </ul>
+                </div>
+            </nav>
+            <div className="carousel">
+                <div className="carousel-list">
+                    <div className="carousel-item">
+                        <img src="/carrusel-02.png" alt="" />
+                        <div className="carousel-content">
+                            <div className="carousel-author">Geriatrico</div>
+                            <div className="carousel-title">Bienvenido</div>
+                            <div className="carousel-topic"> {persona ? persona.nombre : "Usuario"}</div>
+                            <div className="carousel-description">
+                                <div className="logo-container">
+                                    <img src="/logoWhite.png" alt="Logo" className="logo-overlay" />
+                                </div>
+                                En la Fundación Años Maravillosos ofrecemos cuidados integrales y humanizados basados
+                                en el respeto, empatía y la excelencia profesional. La fundación brinda un entorno seguro y
+                                acogedor que promueva el bienestar físico, emocional y social de todos nuestros residentes,
+                                mejorando así la calidad de vida de nuestros adultos mayores.
+                            </div>
+
+                            <div className="carousel-buttons">
+                                <button className="button">Leer mas</button>
+                                <button className="button">Leer mas</button>
+                            </div>
                         </div>
                     </div>
-                    <div className="change-password" onClick={() => navigate("/forgotPassword")}>
-                        <i className="fa-solid fa-lock" />
-                        <p className="change-password-text">Cambiar clave</p>
-                    </div>
-                    <button onClick={startLogout} className='btn-logout'>
-                        <i className="fa-solid fa-right-from-bracket" />
-                    </button>
-                </ul>
-            </nav>         
-            <aside className="sidebar">
-                <SelectRol 
-                    label="Rol" 
-                    name="rol_id" 
-                    value={rolSeleccionado?.rol_id} 
-                    onChange={handleRolChange} 
-                />
-            </aside>
+                </div>
+            </div>
         </div>
     );
 };

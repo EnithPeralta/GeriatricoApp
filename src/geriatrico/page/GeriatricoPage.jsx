@@ -113,6 +113,7 @@ export const GeriatricosPage = () => {
         <div className="container-geriatrico">
             <GoBackButton />
             <div className="content-geriatrico">
+
                 <div className="titulo-input">
                     <h1 className="titulo">Lista de Geriátricos</h1>
                     <button className="button-geriatrico" onClick={() => navigate("/geriatrico/geriatricoInactive")}>

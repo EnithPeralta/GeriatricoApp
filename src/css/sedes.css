@@ -50,10 +50,11 @@
     font-weight: 500;
 }
 
-.logo {
-    color: white;
-    font-size: 24px;
-    font-weight: 600;
+.sede-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    margin-bottom: 10px;
 }
 
 .container {
@@ -66,16 +67,44 @@
     margin-top: 20px; 
     height: 700px;
     
-
-h1 {
+.sedes-header {
+    position: sticky;
+    top: 0;
+    background-color: white; /* Asegura que no se superponga con el contenido al hacer scroll */
+    z-index: 10;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e0e0e0;
+}    
+.sedes-title {
     font-size: 28px;
     margin-bottom: 30px;
     color: #333;
     font-weight: 600;
     margin-left: 20px;
-
     top: 10px;
     position: relative;
+}
+.add-button-sedes {
+    background-color: #4BB6C2;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px auto 0;
+    transition: background-color 0.2s;
+}
+
+.add-button-sedes:hover {
+    background-color: #3a9ba7;
 }
 
 .cont {
@@ -83,6 +112,8 @@ h1 {
     max-width:1000px;
     height: 100%;
     border-radius: 20px;
+    overflow-x:auto ;
+    white-space: nowrap;
 }
 
 .sede-card {
@@ -109,7 +140,6 @@ h1 {
 }
 
 .sede-icon {
-    background-color: #f5f5f5;
     padding: 12px;
     border-radius: 10px;
     margin-right: 15px;
@@ -122,24 +152,29 @@ h1 {
 
 .sede-icon i {
     font-size: 20px;
-    color: #666;
 }
 
 .sede-info {
     flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
 }
 
 .sede-name {
+    align-items: center;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.sede-address {
+    align-items: center;
     font-size: 14px;
     color: #666;
     margin-bottom: 5px;
     font-weight: 500;
-}
-
-.pacientes {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
 }
 
 .status-icon {
@@ -147,31 +182,85 @@ h1 {
     font-size: 20px;
 }
 
-.add-button-sedes {
-    background-color: #4BB6C2;
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 30px auto 0;
-    transition: background-color 0.2s;
-}
-
-.add-button-sedes:hover {
-    background-color: #3a9ba7;
-}
 
 .status-icon i {
     font-size: 18px;
     color: #4BB6C2;
 }}
+/* Modal Crear */
 
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  .modal-container .h2 {
+    margin-bottom: 10px;
+  }
+  
+  .modal-container .input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .preview-image {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    margin: 10px 0;
+    border-radius: 5px;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .cancel-btn {
+    background: #ccc;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .save-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .cancel-btn:hover {
+    background: #bbb;
+  }
+  
+  .save-btn:hover {
+    background: #218838;
+  }
+  
 @media screen and (max-height: 700px) {
     .bodySedes {
         padding-top: 70px;

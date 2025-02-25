@@ -1,0 +1,120 @@
+:root{
+    --base-clr: #e6e6e6;
+    --line-clr: #bdbdbd;
+    --hover-clr: #bdbdbd;
+    --text-clr: #3D3D3D;
+    --secondary-text-clr: #b0b3c1;
+  }
+.bodySidebar{
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: var(--base-clr);
+    color: var(--text-clr);
+    line-height: 1.5rem;
+  }
+  #sidebar{
+    box-sizing: border-box;
+    height: 100vh;
+    width: 250px;
+    padding: 5px 1em;
+    background-color: var(--base-clr);
+    border-right: 1px solid var(--line-clr);
+    position: sticky;
+    top: 0;
+    align-self: start;
+    transition: 300ms ease-in-out;
+    overflow: hidden;
+    text-wrap: nowrap;
+  }
+  #sidebar.close{
+    padding: 5px;
+    width: 60px;
+  }
+  #sidebar ul{
+    list-style: none;
+  }
+  #sidebar > ul > li:first-child{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+    
+  }
+  #sidebar ul li.active a{
+    color: var(--accent-clr);
+  
+    svg{
+      fill: var(--accent-clr);
+    }
+  }
+  
+  #sidebar a, #sidebar .dropdown-btn, #sidebar {
+    border-radius: .5em;
+    padding: .85em;
+    text-decoration: none;
+    color: var(--text-clr);
+    display: flex;
+    align-items: center;
+    gap: 1em;
+  }
+  .dropdown-btn{
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+  }
+  #sidebar i{
+    flex-shrink: 0;
+    fill: var(--text-clr);
+  }
+  #sidebar a span, #sidebar .dropdown-btn span{
+    flex-grow: 1;
+  }
+  #sidebar a:hover, #sidebar .dropdown-btn:hover{
+    background-color: var(--hover-clr);
+  }
+  #sidebar .sub-menu{
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: 300ms ease-in-out;
+  
+    > div{
+      overflow: hidden;
+    }
+  }
+  #sidebar .sub-menu.show{
+    grid-template-rows: 1fr;
+  }
+  .dropdown-btn i{
+    transition: 200ms ease;
+  }
+  .rotate i:last-child{
+    rotate: 180deg;
+  }
+  #sidebar .sub-menu a{
+    padding-left: 2em;
+  }
+  #toggle-btn {
+    margin-left: auto;
+    padding: 1em;
+    border: none;
+    border-radius: .5em;
+    background: none;
+    cursor: pointer;
+  }
+  
+  main{
+    padding: min(30px, 7%);
+  }
+  main p{
+    color: var(--secondary-text-clr);
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+  .container{
+  display: flex;
+    h2, p { margin-top: 1em }
+  }
+  
+  

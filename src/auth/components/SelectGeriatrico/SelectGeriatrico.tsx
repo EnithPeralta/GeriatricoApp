@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SelectGeriatricoProps } from './types';
 import { useGeriatrico } from '../../../hooks/useGeriatrico';
+import '../../../css/asignar.css'
 
 export const SelectGeriatrico = ({ label, ...props }: SelectGeriatricoProps) => {
     const { obtenerGeriatricos } = useGeriatrico();
@@ -29,15 +30,15 @@ export const SelectGeriatrico = ({ label, ...props }: SelectGeriatricoProps) => 
     }, [obtenerGeriatricos]);
 
     return (
-        <div className="input-container-register">
+        <div className="dropdown-button-geriatrico">
             <label>{label}</label>
             <select
-                className="custom-select-container"
+                className="select-geriatrico"
                 name={props.name}
                 value={props.value || ""}
                 onChange={props.onChange}
             >
-                <option value="">Seleccione Geriátrico</option>
+                <option hidden>Seleccione Geriátrico</option>
                 {error ? (
                     <option value="" disabled>{`Error: ${error}`}</option>
                 ) : (

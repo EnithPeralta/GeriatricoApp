@@ -18,8 +18,17 @@
   flex-direction: column;
   align-items: stretch;
   transition: transform 0.3s;
+  flex: 1;
 }
 
+.sidebar-geriatrico {
+    width: 250px;
+    height: 730px;
+    background: #E9E9E9;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+}
 /* Título */
 .titulo {
     font-size: 24px;
@@ -109,7 +118,6 @@
 }
 
 
-
 /* Cambia el color del borde y el fondo cuando el input está seleccionado */
 .search-input:focus {
     border-color: #007bff;  /* Color azul */
@@ -183,24 +191,34 @@
     opacity: 0;  /* Ocultamos por defecto */
     transition: opacity 0.3s ease;
 }
-.actions .toggle-button, .edit-button {
-    background: rgba(0, 0, 0, 0.7);
+.actions .toggle-button, .edit-button, .edit-button-sedes {
     border: none;
     padding: 5px 8px;
     border-radius: 5px;
     cursor: pointer;
     transition: background 0.3s ease;
+    color: white;
 }
-.actions .toggle-button, .edit-button:hover {
+.actions .toggle-button .edit-button-sedes{
     background: rgba(0, 0, 0, 1);
 }
-.edit-button {
-    background: #007bffcc; /* Azul */
+
+.edit-button-sedes {
+    background: #0099ffbe; /* Azul */
+    color: white;
+    margin-top: 15px;
+    transform: scale(1);
+    width: 50px;
+    height: 25px;
+    border-radius: 10px;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.toggle-button :active {
-    background: #ffcc00cc; /* Amarillo */
-}
 
 .actions.toggle-button:hover {
     background-color: #ffcc00;
@@ -214,6 +232,19 @@
 .fas {
     font-size: 13.5px;
 }
+
+.card.active {
+    border: 2px solid green; /* Borde verde si está activo */
+    background-color: #e6f9e6; /* Fondo verde claro */
+    color: black; /* Color de texto */
+}
+
+.card.inactive {
+    border: 2px solid red; /* Borde rojo si está inactivo */
+    background-color: #f9e6e6; /* Fondo rojo claro */
+    color: gray; /* Color de texto más apagado */
+}
+
 
 .modal-overlay {
     position: fixed;

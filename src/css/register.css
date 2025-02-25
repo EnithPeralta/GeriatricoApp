@@ -180,6 +180,27 @@
     background-color: #f8f9fa;
     color: #333;
 }
+.search-container-asignar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 100rem;
+    gap: 10px;
+    margin-top: 0px;
+}
+.search-button-buscar{
+    background-color: #009ee2;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 150px;
+}
 /* Estilos específicos para pantallas móviles */
 @media (max-width: 768px) {
     .BodyLogin {

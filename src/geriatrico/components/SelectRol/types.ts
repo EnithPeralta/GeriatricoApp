@@ -12,5 +12,6 @@ export interface SelectRolProps {
     label: string;
     name: string;
     value: string;
-    onChange: VoidFunction;
+    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void; // ✅ Ahora acepta el evento
 }
+

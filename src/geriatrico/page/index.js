@@ -1,4 +1,5 @@
-export * from './AdminPage';
+export * from './AdminSuper';
+export * from './AdminGeriatrico';
 export * from './SedesPage';
 export * from './PacientesPage';
 export * from './SedeEspecificaPage';
@@ -7,3 +8,6 @@ export * from './ProfilePage';
 export * from './GeriatricoPage';
 export * from './RolesPage';
 export * from './GeriatricoInactivoPage';
+export * from './GestionarPersonas';
+export * from './SedesInactivoPage';
+export * from './GestionPersonaGeriatricoPage';

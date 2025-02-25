@@ -18,6 +18,7 @@ geriatricoApi.interceptors.request.use(config => {
         config.headers = {
             ...config.headers,
             Authorization: `Bearer ${token}`, // Agregar el token al header
+            
         };
     }
 
