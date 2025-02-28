@@ -253,6 +253,7 @@ export const GestionPersonaGeriatricoPage = () => {
 
     }
 
+
     const handleAssignRole = async () => {
         if (!selectedPersona || selectedSedes.length === 0 || selectedRoles.length === 0 || !fechaInicio) {
             console.log("Validación fallida: ", selectedRoles, selectedSedes, selectedPersona, fechaInicio, fechaFin);

@@ -398,8 +398,6 @@ export const useGeriatrico = () => {
                 }
             });
 
-            console.log("Datos recibidos:", data);
-
             dispatch(saveGeriatricoSuccess({
                 message: "Geriátrico obtenido",
                 geriatrico: data.geriatrico,

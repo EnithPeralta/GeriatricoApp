@@ -50,6 +50,8 @@ export const useGeriatricoPersonaRol = () => {
     }
   };
 
+  
+
   return {
     asignarRolGeriatrico,
   };

@@ -88,7 +88,6 @@ export const useGeriatricoPersona = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("Respuesta de la API:", response.data);
 
             return {
                 success: true,
