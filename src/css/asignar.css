@@ -4,7 +4,6 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: url('/Bg.jpg') no-repeat center center/cover;
     padding: 20px;
 }
 
@@ -86,19 +85,22 @@
 
 /* Tarjeta de usuario */
 .sede-card-asignar {
-    background: #f9f9f9;
-    border-radius: 10px;
-    padding: 15px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 16px;
     display: flex;
-    gap: 15px;
-    width: 115ch;
-    height: 100q;
-    border: 1px solid #ddd;
-    transition: 0.3s;
+    align-items: center;
+    margin-bottom: 16px;
     cursor: pointer;
-    margin-top: 15px;
+    gap: 10px;
 }
 
+.container-cards{
+    width: 100%;
+    max-width: 1024px;
+    padding: 0 16px;
+}
 .sede-card-asignar:hover {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -111,12 +113,28 @@
     align-items: center;
     margin-left: 10px;
 } 
-.fas{
-    font-size: 20px;
+
+
+
+.sede-info-asignar{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    font-weight: 500;
+    color: #333;
+    margin-top: -10px;
+}
+
+.buttons-asignar{
+    display: flex;
+    gap: 10px;
 }
 
 .sede-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .full-name {
@@ -137,25 +155,40 @@
 
 .add-button-asignar,
 .edit-button-asignar,
-.inactive-button-asignar
+.active-button-asignar,
+.inactive-button-asignar,
+.inactive-button-fa
  {
-    background-color: #009ee2;
     color: white;
     border: none;
     width: 40px;
     height: 40px;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 18px;
+    gap: 15px;
 }
+.inactive-button-fa{
+    background-color:#df0016 ;
+}
+
+
+.active-button-asignar {
+    background-color: #07db00;
+}
+
+.active-button-asignar:hover {
+    background-color: #087005;
+}
+
 .inactive-button-asignar{
     background-color: #df0016;
 }
 .edit-button-asignar {
-    background-color: #2daa3d;
+    background-color: #fccf08;
 }
 
 .add-button-asignar:hover {
@@ -166,7 +199,7 @@
     background-color: #0d470a;
 }
 
-.inactive-button-asignar:hover{
+.inactive-button-asignar:hover, .inactive-button-fa:hover{
     background-color: #af1625;
 }
 
@@ -214,6 +247,7 @@ background-color: #ddd;
     border-radius: 5px;
     font-size: 14px;
 }
+
 .dropdown:hover .dropdown-content-geriatrico {
 display: block; /* Mostrar contenido del dropdown al pasar el mouse */
 }
@@ -235,47 +269,94 @@ display: block; /* Mostrar contenido del dropdown al pasar el mouse */
     margin-right: 20px;
 }
 
-
-
-/* Estilos del modal
-.modal-container {
-    position: fixed; 
-    top: 50%;
+.asignar-img-edit{
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+    position: relative;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    z-index: 1000; /* Asegura que esté por encima de otros elementos 
-    width: 300px; /* Ajusta según el diseño 
 }
-  
-  .form-asignar {
+
+.icon-edit{
+    font-size: 4rem;
+    border-radius: 50%;
+    position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .button-group {
+}
+
+.status-icon-active{
+    position: relative;
     display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
-  .btn-guardar {
-    background: #4CAF50;
+    justify-content: center;
+    left: -46rem ;
+    top: -3rem;
+    padding: 0px;
+}
+
+.status-icon-active .activo{
+    color: green;
+    font-size: 15px;
+}
+
+.status-icon-active .inactivo {
+    color: red;
+    font-size: 15px;
+}
+
+.edit-button-asignar-user{
+    background-color: #2daa3d;
     color: white;
     border: none;
-    padding: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-right: 20px;
+}
+   
+   .status-icon-asignar{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    left: -8rem ;
+    top: 0rem;
+  }
+
+   .status-icon-asignar .activo {
+    color: green;
+    font-size: 15px;
   }
   
-  .btn-cerrar {
-    background: #f44336;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
+  .status-icon-asignar .inactivo {
+    color: red;
+    font-size: 15px;
   }
-   */
+
+  .sede-card-asignar.inactive {
+    background-color: #f8d7da; /* Rojo claro */
+    border: 1px solid #dc3545; /* Rojo */
+    color: #721c24; /* Texto rojo oscuro */
+}
+
+input[type="checkbox"]{
+    cursor: pointer;
+    position: relative;
+    margin: 4px;
+    transform: scale(1.5);
+}
+.checkbox-label{
+    font-size: 15px;
+    gap: 5px;
+    display: flex;  
+}
+
+.form-group-asignar{
+    
+}
+.date-label{
+    font-size: 15px;
+}

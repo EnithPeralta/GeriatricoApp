@@ -48,10 +48,11 @@
     font-weight: 500;
 }
 
-.logo {
-    color: white;
-    font-size: 24px;
-    font-weight: 600;
+.logo-sedEspe {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-right: 20px;
 }
 
 .container {
@@ -65,15 +66,15 @@
     height: 700px;
     
 
-h1 {
+.sede-title {
     font-size: 28px;
     margin-bottom: 30px;
     color: #333;
     font-weight: 600;
     margin-left: 20px;
-
     top: 10px;
     position: relative;
+    text-align: center;
 }
 
 .cont {
@@ -129,7 +130,7 @@ h1 {
 }
 
 .sede-name {
-    font-size: 14px;
+    font-size: 20px;
     color: #666;
     margin-bottom: 5px;
     font-weight: 500;

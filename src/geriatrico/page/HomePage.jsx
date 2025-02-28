@@ -34,38 +34,38 @@ export const HomePage = () => {
 
         fetchPersona();
     }, []); // Se ejecuta solo una vez al montar el componente
-    
+
     useEffect(() => {
-        if (!rolSeleccionado) return; // No hacer nada si aún no está definido
-    
+        if (!rolSeleccionado || !rolSeleccionado.rol_id) return;
+
         console.log("🎯 Verificando rol seleccionado:", rolSeleccionado);
-    
-        switch (rolSeleccionado.rol_id) {
-            case 2:
-                console.log("🔀 Redirigiendo a /geriatrico/sedes...");
-                navigate(`/geriatrico/sedes`);
-                break;
-            case 3:
-                console.log("🔀 Redirigiendo a /geriatrico/sedeEspecifica...");
-                navigate(`/geriatrico/sedeEspecifica`);
-                break;
-            default:
-                console.log("ℹ️ No hay redirección para este rol:", rolSeleccionado.rol_id);
-                break;
+
+        if (rolSeleccionado.rol_id === 3) {
+            if (!rolSeleccionado.se_id) {
+                console.warn("⚠️ No se encontró se_id. Esperando actualización...");
+                return;
+            }
+            console.log("🔀 Redirigiendo a /geriatrico/sedeEspecifica...");
+            navigate(`/geriatrico/sedeEspecifica`);
+        } else if (rolSeleccionado.rol_id === 2) {
+            console.log("🔀 Redirigiendo a /geriatrico/sedes...");
+            navigate(`/geriatrico/sedes`);
         }
     }, [rolSeleccionado, navigate]);
-    
+
+
 
 
     const handleRolChange = async (event) => {
         const selectedOption = event.target.selectedOptions[0];
         const rolId = selectedOption.value;
         const geId = selectedOption.getAttribute("data-ge_id");
+        const seId = selectedOption.getAttribute("data-se_id"); // Agregar seId
 
-        console.log("Rol seleccionado:", rolId, geId);
+        console.log("Rol seleccionado:", rolId, "GeID:", geId, "SeID:", seId);
 
         if (rolId && rolId !== String(rolSeleccionado?.rol_id)) {
-            await seleccionarRol({ rol_id: rolId, ge_id: geId });
+            await seleccionarRol({ rol_id: rolId, ge_id: geId, se_id: seId }); // Enviar se_id
         }
     };
 
@@ -118,7 +118,6 @@ export const HomePage = () => {
                                 acogedor que promueva el bienestar físico, emocional y social de todos nuestros residentes,
                                 mejorando así la calidad de vida de nuestros adultos mayores.
                             </div>
-
                             <div className="carousel-buttons">
                                 <button className="button">Leer mas</button>
                                 <button className="button">Leer mas</button>

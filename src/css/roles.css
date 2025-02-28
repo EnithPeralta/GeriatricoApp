@@ -178,11 +178,7 @@
     background: #b02a37;
     color: white;
 }
-.rol-buttons{
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-}
+
 
 /* Modal Editar */
 .rol-form-edit{

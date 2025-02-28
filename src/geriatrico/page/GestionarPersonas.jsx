@@ -72,11 +72,12 @@ export const GestionarPersonas = () => {
 
     const handleCardClick = async (persona) => {
         const isActive = activeCard === persona.id ? null : persona.id;
+        console.log("Persona clickeada:", persona.id, "activeCard antes:", activeCard, "activeCard después:", isActive);
         setActiveCard(isActive);
-
         if (isActive) {
             try {
                 const response = await obtenerPersonaRoles({ per_id: persona.id });
+                console.log("Respuesta de la API:", response);
                 if (response.success) {
                     setRoles({
                         rolesGeriatrico: response.persona.rolesGeriatrico || [],
@@ -289,38 +290,29 @@ export const GestionarPersonas = () => {
                                     </button>
                                 </div>
 
-                                {activeCard === filteredPersona.id && (
+                                {Number(activeCard) === Number(filteredPersona.id) && (
                                     <div className="sede-card-asignar">
                                         {roles.rolesGeriatrico.length > 0 || roles.rolesSede.length > 0 ? (
                                             <>
-                                                {roles.rolesGeriatrico.length > 0 && (
-                                                    <div className="sede-info">
-                                                        {roles.rolesGeriatrico.map((rol, index) => (
-                                                            <div key={index}>
-                                                                <div className="full-name" >
-                                                                    {rol.nombre}
-                                                                </div>
-                                                                <div className="CC">{rol.geriatrico.nit}</div>
-                                                                <div className="CC">{rol.geriatrico.nombre}</div>
-                                                            </div>
-                                                        ))}
+                                                {roles.rolesGeriatrico.map((rol, index) => (
+                                                    <div key={index}>
+                                                        <div className="full-name">{rol.rol_nombre}</div>
+                                                        <div className="CC">{rol.geriatrico?.ge_nit}</div>
+                                                        <div className="CC">{rol.geriatrico?.ge_nombre}</div>
+                                                        <div className="CC">{rol.fechaInicio} - {rol.fechaFin}</div>
                                                     </div>
-                                                )}
-                                                {roles.rolesSede.length > 0 && (
-                                                    <div>
-                                                        {roles.rolesSede.map((rol, index) => (
-                                                            <div key={index}>
-                                                                <div className="full-name">
-                                                                    {rol.nombre}
-                                                                </div>
-                                                                <div className="CC">{rol.sede.geriatrico.nitGeriatrico}</div>
-                                                                <div className="CC">{rol.sede.nombre}</div>
-                                                            </div>
-                                                        ))}
+                                                ))}
+                                                {roles.rolesSede.map((rol, index) => (
+                                                    <div key={index}>
+                                                        <div className="full-name">{rol.nombre}</div>
+                                                        <div className="CC">{rol.sede?.geriatrico?.nitGeriatrico}</div>
+                                                        <div className="CC">{rol.sede?.nombre}</div>
                                                     </div>
-                                                )}
+                                                ))}
                                             </>
-                                        ) : null}
+                                        ) : (
+                                            <p>No hay roles asignados.</p>
+                                        )}
                                     </div>
                                 )}
 
@@ -329,8 +321,8 @@ export const GestionarPersonas = () => {
                                     <div className="sede-card-asignar">
                                         <SelectGeriatrico name="ge_id" value={selectedGeriatrico} onChange={(e) => setSelectedGeriatrico(Number(e.target.value))} />
                                         <SelectField name="rol_id" value={selectedRoles} onChange={(roles) => setSelectedRoles(roles.map(Number))} />
-                                        <div className="form-group">
-                                            <label>Fecha de Inicio:</label>
+                                        <div className="form-group-asignar">
+                                            <label className="date-label">Fecha Inicial:</label>
                                             <input
                                                 type="date"
                                                 value={fechaInicio}
@@ -338,8 +330,8 @@ export const GestionarPersonas = () => {
                                                 onChange={(e) => setFechaInicio(e.target.value)}
                                             />
                                         </div>
-                                        <div className="form-group">
-                                            <label>Fecha de Fin (opcional):</label>
+                                        <div className="form-group-asignar">
+                                            <label className="date-label">Fecha Final (opcional):</label>
                                             <input
                                                 type="date"
                                                 className="date-input"
@@ -355,45 +347,60 @@ export const GestionarPersonas = () => {
                         ) : null}
 
                         {showEditModal && editedPersona && (
-                            <div className="modal">
-                                <div className="modal-content">
-                                    <h3>Editar Persona</h3>
-                                    <form onSubmit={handleEditSubmit}>
-                                        <div className="modal-picture">
-                                            {editedPersona.foto ? (
-                                                <img src={editedPersona.foto} alt="Foto de perfil" className="modal-img" />
-                                            ) : (
-                                                <i className="fas fa-user-circle"></i>
-                                            )}
-                                        </div>
+                            <div className="modal-overlay">
+                                <div className="modal">
+                                    <div className="modal-content">
+                                        <form onSubmit={handleEditSubmit}>
+                                            <div className="asignar-img-edit">
+                                                {editedPersona.foto ? (
+                                                    <img src={editedPersona.foto} alt="Foto de perfil" height={100} width={100} />
+                                                ) : (
+                                                    <i className="fas fa-user-circle icon-edit"></i>
+                                                )}
+                                            </div>
+                                            <div className="modal-field">
+                                                <label>Cambiar foto:</label>
+                                                <input type="file" name="foto" accept="image/*" onChange={handleFileChange} />
+                                            </div>
 
-                                        <label className="modal-label">Cambiar foto:</label>
-                                        <input className="modal-input" type="file" name="foto" accept="image/*" onChange={handleFileChange} />
+                                            <div className="modal-field">
+                                                <label >Usuario:</label>
+                                                <input type="text" name="usuario" value={editedPersona.usuario} onChange={handleEditChange} required />
+                                            </div>
 
-                                        <label className="modal-label">Usuario:</label>
-                                        <input className="modal-input" type="text" name="usuario" value={editedPersona.usuario} onChange={handleEditChange} required />
+                                            <div className="modal-field">
+                                                <label >Nombre Completo:</label>
+                                                <input type="text" name="nombre" value={editedPersona.nombre} onChange={handleEditChange} required />
+                                            </div>
 
-                                        <label className="modal-label">Nombre Completo:</label>
-                                        <input className="modal-input" type="text" name="nombre" value={editedPersona.nombre} onChange={handleEditChange} required />
+                                            <div className="modal-field">
+                                                <label >Correo:</label>
+                                                <input type="email" name="correo" value={editedPersona.correo} onChange={handleEditChange} required />
+                                            </div>
 
-                                        <label className="modal-label">Correo:</label>
-                                        <input className="modal-input" type="email" name="correo" value={editedPersona.correo} onChange={handleEditChange} required />
+                                            <div className="modal-field">
+                                                <label >Teléfono:</label>
+                                                <input type="text" name="telefono" value={editedPersona.telefono} onChange={handleEditChange} required />
+                                            </div>
 
-                                        <label className="modal-label">Teléfono:</label>
-                                        <input className="modal-input" type="text" name="telefono" value={editedPersona.telefono} onChange={handleEditChange} required />
+                                            <div className="modal-field">
+                                                <label >Género:</label>
+                                                <input type="text" name="genero" value={editedPersona.genero} onChange={handleEditChange} required />
+                                            </div>
 
-                                        <label className="modal-label">Género:</label>
-                                        <input className="modal-input" type="text" name="genero" value={editedPersona.genero} onChange={handleEditChange} required />
+                                            <div className="modal-field">
+                                                <label >Contraseña:</label>
+                                                <input type="password" name="password" value={editedPersona.password} onChange={handleEditChange} required />
+                                            </div>
 
-                                        <label className="modal-label">Contraseña:</label>
-                                        <input className="modal-input" type="password" name="password" value={editedPersona.password} onChange={handleEditChange} required />
-
-                                        <div className="modal-buttons">
-                                            <button type="submit" className="btn-save">Guardar</button>
-                                            <button type="button" className="btn-cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
-                                        </div>
-                                    </form>
+                                            <div className="modal-buttons">
+                                                <button type="submit" className="create">Guardar</button>
+                                                <button type="button" className="cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
+                                            </div>
+                                        </form>
+                                    </div>
                                 </div>
+
                             </div>
                         )}
                     </div>

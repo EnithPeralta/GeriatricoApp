@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useGeriatrico } from "../../hooks/useGeriatrico";
 import { CargandoComponent, ModalCrearGeriatrico, ModalEditarGeriatrico, ModalGeriatrico } from "../components";
-import { GoBackButton } from "../components/GoBackButton";
 import Swal from "sweetalert2";
 import '../../css/geriatrico.css';
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../hooks";
 
 export const GeriatricosPage = () => {
     const navigate = useNavigate();
-    const { obtenerGeriatricosActive, crearGeriatrico, actualizarGeriatrico, inactivarGeriatrico } = useGeriatrico();
+    const { obtenerGeriatricos, crearGeriatrico, actualizarGeriatrico, inactivarGeriatrico, reactivarGeriatrico } = useGeriatrico();
+    const { startLogout } = useAuthStore();
     const [geriatricos, setGeriatricos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -21,7 +22,8 @@ export const GeriatricosPage = () => {
     useEffect(() => {
         const fetchGeriatricos = async () => {
             try {
-                const result = await obtenerGeriatricosActive();
+                const result = await obtenerGeriatricos();
+                console.log(result);
                 if (result.success) {
                     setGeriatricos(result.geriatricos);
                 } else {
@@ -93,8 +95,35 @@ export const GeriatricosPage = () => {
         if (confirm.isConfirmed) {
             const result = await inactivarGeriatrico(ge_id);
             if (result.success) {
-                Swal.fire("Inactivado", "El geriátrico ha sido inactivado correctamente.", "success");
+                Swal.fire({
+                    icon: "success",
+                    text: "El geriátrico ha sido inactivado correctamente.",
+                });
                 setGeriatricos((prev) => prev.filter(g => g.ge_id !== ge_id)); // Remueve el geriátrico de la lista
+            } else {
+                Swal.fire("Error", result.message, "error");
+            }
+        }
+    };
+
+    const handleReactivarGeriatrico = async (ge_id) => {
+        const confirm = await Swal.fire({
+            text: "¿Estás seguro de que deseas reactivar este geriátrico?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, reactivar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (confirm.isConfirmed) {
+            const result = await reactivarGeriatrico(ge_id);
+
+            if (result.success) {
+                Swal.fire({
+                    icon: "success",
+                    text: "El geriátrico ha sido reactivado correctamente."
+                });
+                setGeriatricoInactive((prev) => prev.filter(g => g.ge_id !== ge_id)); // Remueve el geriátrico de la lista
             } else {
                 Swal.fire("Error", result.message, "error");
             }
@@ -110,29 +139,46 @@ export const GeriatricosPage = () => {
     );
 
     return (
-        <div className="container-geriatrico">
-            <GoBackButton />
-            <div className="content-geriatrico">
-
-                <div className="titulo-input">
-                    <h1 className="titulo">Lista de Geriátricos</h1>
-                    <button className="button-geriatrico" onClick={() => navigate("/geriatrico/geriatricoInactive")}>
-                        Geriatricos Inactivos
-                    </button>
-                    <input
-                        type="text"
-                        placeholder="Buscar por nombre o NIT..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="search-input"
-                    />
+        <div className="flex">
+            <div className="sidebar">
+                <div className="logo"></div>
+                <div className="icons">
+                    <div className="icon" onClick={() => navigate("/geriatrico/superAdmin")}>
+                        <i className="fa-solid fa-building" />
+                        <span className="icon-text">Inicio Admin</span>
+                    </div>
+                    <div className="icon" onClick={() => navigate("/geriatrico/roles")}>
+                        <i className="fa-solid fa-users-gear" />
+                        <span className="icon-text">Ver Roles</span>
+                    </div>
+                    <div className="icon" onClick={() => navigate("/geriatrico/asignar")}>
+                        <i className="fa-solid fa-users" />
+                        <span className="icon-text">Ver Personas</span>
+                    </div>
+                    <div className="icon" onClick={() => navigate("/register")}>
+                        <i className="fa-solid fa-user-plus" />
+                        <span>Registrar</span>
+                    </div>
+                    <div className="icon" onClick={startLogout}  >
+                        <i className="fa-solid fa-right-from-bracket" />
+                        <span className="icon-text">Salir</span>
+                    </div>
                 </div>
+            </div>
+            <div className="main-content">
+                <input
+                    type="text"
+                    placeholder="Buscar por nombre o NIT..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                />
                 <div className="grid">
                     {filteredGeriatricos.length > 0 ? (
                         filteredGeriatricos.map((geriatrico) => (
-                            <div key={geriatrico.ge_nit} className="card">
-                                <div className="card-content">
-                                    <h2 className="geriatrico-name">{geriatrico.ge_nombre}</h2>
+                            <div key={geriatrico.ge_nit} >
+                                <div className="grid-item">
+                                    <span className="geriatrico-name">{geriatrico.ge_nombre}</span>
                                     <p className="geriatrico-nit">NIT: {geriatrico.ge_nit}</p>
                                     <div className="color-boxes">
                                         <span className="color-box" style={{ backgroundColor: geriatrico.ge_color_principal }}></span>
@@ -142,15 +188,28 @@ export const GeriatricosPage = () => {
                                     <img
                                         src={geriatrico.ge_logo || "/public/Admin.jpg"}
                                         alt="Logo"
-                                        className="geriatrico-logo"
+                                        width="100"
+                                        height="100"
                                         onError={(e) => { e.target.src = "/public/Admin.jpg"; }}
                                     />
-
-                                    <button className="details-button" onClick={() => handleViewDetails(geriatrico)}>Ver Detalles</button>
+                                    <div className="status-icon">
+                                        {geriatrico.ge_activo ? (
+                                            <i className="fa-solid fa-circle-check activo"></i>
+                                        ) : (
+                                            <i className="fa-solid fa-circle-xmark inactivo"></i>
+                                        )}
+                                    </div>
+                                    <button className="details-button" onClick={() => handleViewDetails(geriatrico)}>Ver Sedes</button>
                                     <div className="actions">
                                         <button
                                             className={`toggle-button ${geriatrico.ge_activo ? 'active' : 'inactive'}`}
-                                            onClick={() => handleInactivarGeriatrico(geriatrico.ge_id)}
+                                            onClick={() => {
+                                                if (geriatrico.ge_activo) {
+                                                    handleInactivarGeriatrico(geriatrico.ge_id);
+                                                } else {
+                                                    handleReactivarGeriatrico(geriatrico.ge_id);
+                                                }
+                                            }}
                                         >
                                             <i className={`fas ${geriatrico.ge_activo ? 'fa-toggle-on' : 'fa-toggle-off'}`} />
                                         </button>
@@ -165,15 +224,14 @@ export const GeriatricosPage = () => {
                     ) : (
                         <p className="no-results">No se encontraron resultados</p>
                     )}
-                    <div className="card" onClick={() => setIsCreateModalOpen(true)}>
-                        <div className="card-content-i">
-                            <i className="fas fa-plus" />
+                    <div className="grid-item" onClick={() => setIsCreateModalOpen(true)}>
+                        <div className="grid-item-geriatrico">
+                            <i className="fas fa-circle-plus" />
                             <p>Crear Geriatrico</p>
                         </div>
                     </div>
                 </div>
             </div>
-
             <ModalGeriatrico
                 geriatrico={selectedGeriatrico}
                 isOpen={isModalOpen}

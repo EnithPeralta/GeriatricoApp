@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuthStore, useForm, usePersona, useSession } from '../../hooks';
 import Swal from 'sweetalert2';
 import { InputField } from './InputField/InputField';
-import { useNavigate } from 'react-router-dom';
 import { useGeriatricoPersona } from '../../hooks/useGeriatricoPersona';
 
 const registerFormFields = {
@@ -20,11 +19,12 @@ const registerFormFields = {
 export const RegisterForm = () => {
     const { startRegister, errorMessage } = useAuthStore();
     const { obtenerSesion } = useSession();
-    const navigate = useNavigate();
     const [esSuperAdmin, setEsSuperAdmin] = useState(false);
     const [loading, setLoading] = useState(false);
     const { buscarVincularPersona } = usePersona()
     const { vincularPersonaAGeriatrico } = useGeriatricoPersona();
+    const [adminGeriátrico, setAdminGeriátrico] = useState(null);
+
 
     const fetchedRef = useRef(false);
 
@@ -34,6 +34,7 @@ export const RegisterForm = () => {
                 const sesion = await obtenerSesion();
                 console.log("Sesion obtenida:", sesion);
                 setEsSuperAdmin(sesion?.esSuperAdmin || false);
+                setAdminGeriátrico(sesion?.rol_id == 2);
             };
             fetchSesion();
             fetchedRef.current = true;
@@ -119,9 +120,7 @@ export const RegisterForm = () => {
                 text: 'La cuenta ha sido creada correctamente',
                 timer: 2000,
                 showConfirmButton: false
-            }).then(() => {
-                navigate('/geriatrico/asignar');
-            });
+            })
 
         } catch (error) {
             console.error("Error en el registro:", error);
@@ -149,6 +148,7 @@ export const RegisterForm = () => {
             )}
             <div className="input-grid">
                 <InputField label="Nombre completo" type="text" name="per_nombre_completo" value={per_nombre_completo} onChange={onInputChange} placeholder="Juan Gomez" icon="fas fa-user" required />
+                <InputField label="Cedula" type="cc" name="per_documento" value={per_documento} onChange={onInputChange} placeholder="1234567890" icon="fas fa-id-card" required />
                 <InputField label="E-mail" type="email" name="per_correo" value={per_correo} onChange={onInputChange} placeholder="correo@example.com" icon="fas fa-envelope" required />
                 <InputField label="Usuario" type="text" name="per_usuario" value={per_usuario} onChange={onInputChange} placeholder="juangomez" icon="fas fa-user" required />
                 <InputField label="Contraseña" type={isPasswordVisible ? "text" : "password"} name="per_password" value={per_password} onChange={onInputChange} placeholder="••••••••" icon={`fa-solid ${isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'}`} onClick={togglePasswordVisibility} required />

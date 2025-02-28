@@ -75,7 +75,7 @@ export const useGeriatrico = () => {
         }
 
         try {
-            const { data } = await geriatricoApi.get('/geriatricos/activos', {
+            const { data } = await geriatricoApi.get('/geriatricos', {
                 headers: {
                     Authorization: `Bearer ${token}`, // Agregar token en los headers
                 }
@@ -392,7 +392,7 @@ export const useGeriatrico = () => {
         }
 
         try {
-            const { data } = await geriatricoApi.get('/geriatricos/home', {
+            const { data } = await geriatricoApi.get('/geriatricos/homeGeriatrico', {
                 headers: {
                     Authorization: `Bearer ${token}`, // Agregar token en los headers
                 }

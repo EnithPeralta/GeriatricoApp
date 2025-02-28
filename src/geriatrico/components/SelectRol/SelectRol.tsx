@@ -56,7 +56,8 @@ export const SelectRol = (props: SelectRolProps) => {
                     <option 
                         key={`${index}-${rol.rol_id}`} 
                         value={rol.rol_id}
-                        data-ge_id={rol.ge_id || undefined} // Solo ge_id si existe
+                        data-ge_id={rol.ge_id || undefined} 
+                        data-se_id={rol.se_id || undefined}
                     >
                         {rol.se_nombre || rol.ge_nombre}
                     </option>

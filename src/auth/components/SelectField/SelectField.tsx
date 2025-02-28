@@ -7,38 +7,37 @@ export const SelectField = (props: SelectFieldProps) => {
     const { session, obtenerSesion } = useSession();
     const [roles, setRoles] = useState<{ value: string; label: string }[]>([]);
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+
     useEffect(() => {
         const cargaRoles = async () => {
             try {
-                // Si session está vacío, intentar obtenerlo
                 if (!session) {
-                    console.log(session);
                     console.warn("🔄 Obteniendo sesión...");
                     await obtenerSesion(); 
                 }
-    
-                // Si session sigue sin datos, detener ejecución
-                if (!session?.per_id) {
+                
+                // Esperamos a que session se actualice antes de continuar
+                if (!session?.rol_id) {
                     console.error("⚠️ No se encontró la persona en la sesión.");
                     return;
                 }
-    
-                const personaId = session.per_id;
-    
+
+                const personaId = session.rol_id;
                 const resp = await obtenerRoles();
+
                 if (resp.success) {
                     const opciones = resp.roles
-                        .filter((rol: any) => 
-                            personaId === 1 ? rol.rol_id === 2 : 
-                            personaId === 2 ? rol.rol_id === 3 : 
-                            personaId === 3 ? rol.rol_id !== 3 : 
-                            true
-                        )
+                        .filter((rol: any) => {
+                            if (personaId === 1) return rol.rol_id === 2;
+                            if (personaId === 2) return rol.rol_id === 3;
+                            if (personaId === 3) return [4, 5, 6, 7].includes(rol.rol_id);
+                            return true;
+                        })
                         .map((rol: any) => ({
                             value: rol.rol_id,
                             label: rol.rol_nombre,
                         }));
-    
+
                     setRoles(opciones);
                 } else {
                     console.error("❌ Error al obtener roles:", resp.message);
@@ -47,12 +46,15 @@ export const SelectField = (props: SelectFieldProps) => {
                 console.error("❌ Error en la carga de roles:", error);
             }
         };
-    
-        if (session) {
+
+        // Solo ejecutamos cargaRoles si session ya está definido
+        if (session?.rol_id) {
             cargaRoles();
+        } else {
+            obtenerSesion().then(() => cargaRoles());
         }
     }, [session, obtenerRoles, obtenerSesion]);
-    
+
     /** Maneja los cambios en los checkboxes */
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = event.target;

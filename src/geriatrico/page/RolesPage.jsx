@@ -61,14 +61,6 @@ export const RolesPage = () => {
                 </div>
                 <div className="actions-rol">
                   <button
-                    className={`toggle-button  ? 'active' : 'inactive'}`}
-                    // onClick={() => handleInactivarGeriatrico(geriatrico.ge_id)}
-                  >
-                    {/* <i className={`fas ? 'fa-toggle-on' : 'fa-toggle-off'}`} /> */}
-                    <i className="fas fa-toggle-on" />
-                  </button>
-                  <button
-                    className="edit-button"
                     onClick={() => {
                       setSelectedRol(rol);
                       setIsEditModalOpen(true);

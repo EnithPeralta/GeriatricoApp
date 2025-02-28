@@ -33,7 +33,7 @@ export const ModalUpdatePerson = ({ persona, updatePersona, setPersona, showModa
         console.log("Datos a enviar desde el modal:", editedPersona);
 
         const result = await updatePersona(editedPersona); // Se envía como JSON
-
+        console.log("Respuesta del servidor:", result);
         if (result.success) {
             setPersona(result.persona);
             setShowModal(false);
@@ -43,35 +43,42 @@ export const ModalUpdatePerson = ({ persona, updatePersona, setPersona, showModa
     };
 
     return showModal ? (
-        <div className="modal">
-            <div className="modal-content">
-                <p className="modal-title">Editar Perfil</p>
-                <form onSubmit={handleSubmit}>
-                    <div className="modal-picture">
-                        {editedPersona.per_foto ? (
-                            <img src={editedPersona.per_foto} alt="Foto de perfil" className="modal-img" />
-                        ) : (
-                            <i className="fas fa-user-circle"></i>
-                        )}
-                    </div>
+        <div className="modal-overlay">
+            <div className="modal">
+                <div className="modal-content">
 
-                    <label className="modal-label">Cambiar foto:</label>
-                    <input className="modal-input" type="file" accept="image/*" onChange={handleFileChange} />
+                    <p className="">Editar Perfil</p>
+                    <form onSubmit={handleSubmit}>
+                        <div className="modal-picture">
+                            {editedPersona.per_foto ? (
+                                <img src={editedPersona.per_foto} alt="Foto de perfil" className="modal-img" />
+                            ) : (
+                                <i className="fas fa-user-circle"></i>
+                            )}
+                        </div>
+                        <div className="modal-field">
+                            <label className="modal-label">Cambiar foto:</label>
+                            <input className="modal-input" type="file" accept="image/*" onChange={handleFileChange} />
+                        </div>
+                        <div className="modal-field">
+                            <label className="modal-label">Usuario:</label>
+                            <input className="modal-input" type="text" name="per_usuario" value={editedPersona.per_usuario} onChange={handleChange} required />
+                        </div>
+                        <div className="modal-field">
+                            <label className="modal-label">Correo:</label>
+                            <input className="modal-input" type="email" name="per_correo" value={editedPersona.per_correo} onChange={handleChange} required />
+                        </div>
+                        <div className="modal-field">
+                            <label className="modal-label">Teléfono:</label>
+                            <input className="modal-input" type="text" name="per_telefono" value={editedPersona.per_telefono} onChange={handleChange} required />
+                        </div>
+                        <div className="modal-buttons">
+                            <button type="submit" className="create">Guardar</button>
+                            <button type="button" className="cancel" onClick={() => setShowModal(false)}>Cancelar</button>
+                        </div>
+                    </form>
 
-                    <label className="modal-label">Usuario:</label>
-                    <input className="modal-input" type="text" name="per_usuario" value={editedPersona.per_usuario} onChange={handleChange} required />
-
-                    <label className="modal-label">Correo:</label>
-                    <input className="modal-input" type="email" name="per_correo" value={editedPersona.per_correo} onChange={handleChange} required />
-
-                    <label className="modal-label">Teléfono:</label>
-                    <input className="modal-input" type="text" name="per_telefono" value={editedPersona.per_telefono} onChange={handleChange} required />
-
-                    <div className="modal-buttons">
-                        <button type="submit" className="btn-save">Guardar</button>
-                        <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancelar</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     ) : null;

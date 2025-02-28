@@ -20,6 +20,19 @@ export const sedeSlice = createSlice({
             state.error = null;
             state.message = 'Sedes cargadas correctamente';
         },
+        setUsuario: (state, action) => {
+            state.sedes = action.payload;
+            state.loading = false;
+            state.error = null;
+            state.message = 'Usuarios cargados correctamente';
+        },
+        setSedeRol: (state, action) => {
+            state.sedes = action.payload;
+            state.loading = false;
+            state.error = null;
+            state.message = 'Roles cargados correctamente';
+        },
+            
         setSedeError: (state, action) => {
             state.loading = false;
             state.error = action.payload;
@@ -37,5 +50,5 @@ export const sedeSlice = createSlice({
 });
 
 // Exportar las acciones correctamente
-export const { startSede, setSede, setSedeError, addSede, removeSede } = sedeSlice.actions;
+export const { startSede, setSede, setSedeError, addSede, removeSede, setUsuario, setSedeRol } = sedeSlice.actions;
 

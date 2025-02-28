@@ -57,51 +57,65 @@ export const ModalEditarGeriatrico = ({ geriatrico, isOpen, onClose, onUpdate, u
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <form onSubmit={handleSubmit} className="geriatrico-form-edit">
-                    <h2 className="geriatrico-name">Editar Geriátrico</h2>
-                    <label>Nombre</label>
-                    <input
-                        type="text"
-                        name="ge_nombre"
-                        value={formData.ge_nombre}
-                        onChange={handleChange}
-                        className="geriatrico-input"
-                    />
-                    <label>NIT</label>
-                    <input
-                        type="text"
-                        name="ge_nit"
-                        value={formData.ge_nit}
-                        onChange={handleChange}
-                        className="geriatrico-input"
-                    />
-                    <label>Logo</label>
-                    <input
-                        type="file"
-                        name="ge_logo"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="geriatrico-input"
-                    />
-                    {formData.ge_logo && <img src={formData.ge_logo} alt="Logo" className="logo-preview" />}
-                    <div className="color-boxes-input">
-                        {["ge_color_principal", "ge_color_secundario", "ge_color_terciario"].map(color => (
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-content" >
+                    <form onSubmit={handleSubmit} >
+                        <div className="modal-field">
+                            <label>Nombre</label>
                             <input
-                                key={color}
-                                type="color"
-                                name={color}
-                                value={formData[color]}
+                                type="text"
+                                name="ge_nombre"
+                                value={formData.ge_nombre}
                                 onChange={handleChange}
-                                className="color-box"
+                                className="modal-name"
                             />
-                        ))}
-                    </div>
-                    <div className="modal-buttons">
-                        <button type="submit" className="save-button">Guardar</button>
-                        <button type="button" onClick={onClose} className="cancel-button">Cancelar</button>
-                    </div>
-                </form>
+                        </div>
+                        <div className="modal-field">
+                            <label>NIT</label>
+                            <input
+                                type="text"
+                                name="ge_nit"
+                                value={formData.ge_nit}
+                                onChange={handleChange}
+                                className="geriatrico-input"
+                            />
+                        </div>
+                        <div className="modal-field">
+                            <label>Logo</label>
+                            <input
+                                type="file"
+                                name="ge_logo"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                height={100} width={100}
+                            />
+                            {formData.ge_logo && <img src={formData.ge_logo} alt="Logo" className="geriatrico-logo" height={100} width={100}/>}
+                        </div>
+                        <div className="color-boxes">
+                            {[
+                                { key: "ge_color_principal", label: "Color Principal" },
+                                { key: "ge_color_secundario", label: "Color Secundario" },
+                                { key: "ge_color_terciario", label: "Color Terciario" }
+                            ].map(({ key, label }) => (
+                                <div key={key} className="color-item">
+                                    <label htmlFor={key} className="color-label">{label}</label>
+                                    <input
+                                        id={key}
+                                        type="color"
+                                        name={key}
+                                        value={formData[key]}
+                                        onChange={handleChange}
+                                        className="color-input"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <div className="modal-buttons">
+                            <button type="submit" className="create">Guardar</button>
+                            <button type="button" onClick={onClose} className="cancel">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

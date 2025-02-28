@@ -93,10 +93,6 @@ export const SiderBarLayout = () => {
                     </li>
                 </ul>
             </nav>
-
-            {/* Contenedor del contenido principal */}
-            <div className="content">
-            </div>
         </div>
     );
 };

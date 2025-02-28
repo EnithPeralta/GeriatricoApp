@@ -30,7 +30,7 @@ export const useAuthStore = () => {
                 token: data.token,
             }));
 
-            return { success: true, esSuperAdmin: data.persona.esSuperAdmin }; // ✅ Retorna el rol
+            return { success: true, esSuperAdmin: data.persona.esSuperAdmin, user: data.persona }; // ✅ Retorna el rol
         } catch (error) {
             console.error("❌ Error en la solicitud:", error.response?.data || error);
 
@@ -113,6 +113,7 @@ export const useAuthStore = () => {
         localStorage.removeItem('session');
         localStorage.removeItem('rol_id');
         localStorage.removeItem('ge_id');
+        localStorage.removeItem('se_id');
         
         // Limpiar todos los datos persistidos de Redux
         persistor.purge(); // Limpia los datos persistidos de Redux

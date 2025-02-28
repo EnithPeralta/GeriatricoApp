@@ -94,24 +94,27 @@ export const useSedesRol = () => {
                 message: "Token de autenticación no encontrado",
             };
         }
-
+    
         try {
-            const { data } = await geriatricoApi.put("/sedepersonarol/inactivar", {
-                headers: { Authorization: `Bearer ${token}` },
-                data: { per_id, se_id, rol_id }
-            });
-
+            const { data } = await geriatricoApi.put(
+                "/sedepersonarol/inactivarRolAdminSede",
+                { per_id, se_id, rol_id }, 
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+    
             console.log("✅ Respuesta del servidor:", data);
-
+    
             return {
                 success: true,
                 message: data.message || "Rol administrador sede inactivado exitosamente",
-                sedePersonaRol: data.data || null // Asegurar compatibilidad con la respuesta del backend
+                sedePersonaRol: data.data || null, // Asegurar compatibilidad con la respuesta del backend
             };
-
+    
         } catch (error) {
             console.error("❌ Error al inactivar el rol de la sede:", error);
-
+    
             let errorMessage = "Error al inactivar el rol de la sede";
             if (error.response) {
                 errorMessage = error.response.data?.message || errorMessage;
@@ -120,16 +123,71 @@ export const useSedesRol = () => {
             } else {
                 errorMessage = error.message;
             }
-
+    
             return {
                 success: false,
                 message: errorMessage,
-                sedePersonaRol: null
+                sedePersonaRol: null,
             };
         }
     };
+    
+    const asignarRolesSede = async ({ per_id, rol_id, sp_fecha_inicio, sp_fecha_fin }) => {
+        console.log("📤 Enviando datos para asignar roles a la sede:", { per_id, rol_id, sp_fecha_inicio, sp_fecha_fin });
+    
+        const token = getToken();
+        if (!token) {
+            return {
+                success: false,
+                message: "🔒 Token de autenticación no encontrado.",
+            };
+        }
+    
+        if (!per_id || !rol_id || !sp_fecha_inicio) {
+            return {
+                success: false,
+                message: "❗ Faltan datos obligatorios para asignar el rol.",
+            };
+        }
+    
+        try {
+            const { data } = await geriatricoApi.post(
+                "/sedepersonarol/asignarRolesSede",
+                { per_id, rol_id, sp_fecha_inicio, sp_fecha_fin: sp_fecha_fin || null },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+    
+            console.log("✅ Respuesta del servidor:", data);
+    
+            return {
+                success: true,
+                message: data.message || "Rol asignado correctamente.",
+                nuevaVinculacion: data.nuevaVinculacion,
+                rolNombre: data.rolNombre,
+                mensajeAdicional: data.mensajeAdicional || "",
+                sede: data.sede || null,
+            };
+        } catch (error) {
+            console.error("❌ Error al asignar roles a la sede:", error);
+    
+            let errorMessage = "Error al asignar el rol a la sede.";
+            if (error.response) {
+                errorMessage = error.response.data?.message || errorMessage;
+            }
+    
+            return {
+                success: false,
+                message: errorMessage,
+                sedePersonaRol: null,
+            };
+        }
+    };
+    
 
-
-
-    return { asignarRolAdminSede, obtenerPersonaRolesMiGeriatricoSede, inactivarRolAdminSede };
+    return { asignarRolAdminSede, obtenerPersonaRolesMiGeriatricoSede, inactivarRolAdminSede, asignarRolesSede };
 };

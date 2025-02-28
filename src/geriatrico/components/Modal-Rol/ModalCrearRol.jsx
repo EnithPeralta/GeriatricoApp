@@ -27,18 +27,20 @@ export const ModalCrearRol = ({ isOpen, onClose, onSave }) => {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div onClick={(e) => e.stopPropagation()}>
-                {error && <p className="error-message">{error}</p>}
-                <form onSubmit={handleSubmit} className='rol-form'>
-                    <h2 className="rol-name">Crear Nuevo Rol</h2>
-                    <input
-                        placeholder="Nombre del Rol"
-                        className="rol-input"
-                        type="text"
-                        value={rolNombre}
-                        onChange={(e) => setRolNombre(e.target.value)}
-                        required
-                    />
+            <div className="modal" onClick={(e) => e.stopPropagation()}>
+
+                <div className="modal-content">
+                    {error && <p className="error-message">{error}</p>}
+                    <form onSubmit={handleSubmit} className="rol-form-edit">
+                        <h2 className="rol-name">Crear Nuevo Rol</h2>
+                        <input
+                            placeholder="Nombre del Rol"
+                            className="rol-input"
+                            type="text"
+                            value={rolNombre}
+                            onChange={(e) => setRolNombre(e.target.value)}
+                            required
+                        />
                         <textarea
                             className="rol-input"
                             value={rolDescripcion}
@@ -47,11 +49,12 @@ export const ModalCrearRol = ({ isOpen, onClose, onSave }) => {
                             rows={3}
                             required
                         />
-                    <div className="rol-buttons">
-                        <button className="save-button" type="submit" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</button>
-                        <button className="cancel-button" type="button" onClick={onClose} disabled={loading}>Cancelar</button>
-                    </div>
-                </form>
+                        <div className="rol-buttons">
+                            <button className="create" type="submit" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</button>
+                            <button className="cancel" type="button" onClick={onClose} disabled={loading}>Cancelar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

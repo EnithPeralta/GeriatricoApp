@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { getToken } from "../helpers/getToken";
-import { startSede, setSede, setSedeError } from "../store/geriatrico/sedeSlice";
+import { startSede, setSede, setSedeError, setUsuario, setSedeRol } from "../store/geriatrico/sedeSlice";
 import geriatricoApi from "../api/geriatricoApi";
 
 export const useSede = () => {
@@ -267,13 +267,13 @@ export const useSede = () => {
 
     const obtenerSedesHome = async () => {
         dispatch(startSede());
-        console.log("Intentando obtener sedes para la home...");
-        
+        console.log("📡 Intentando obtener información para la home...");
+    
         const token = getToken();
         if (!token) {
-            const errorMessage = "Token de autenticación no encontrado";
+            const errorMessage = "❌ Token de autenticación no encontrado";
             dispatch(setSedeError(errorMessage));
-            return { success: false, message: errorMessage, sedes: [] };
+            return { success: false, message: errorMessage, sede: null, usuario: null, rol: null };
         }
     
         try {
@@ -283,23 +283,62 @@ export const useSede = () => {
     
             console.log("✅ Respuesta del servidor:", data);
     
-            if (!data.sedes || !Array.isArray(data.sedes)) {
-                throw new Error("Formato de respuesta inválido: No es un array");
-            }
+            // Desestructurar la respuesta del servidor
+            const { sede, usuario, rol , geriatrico } = data;
     
-            dispatch(setSede(data.sedes));
-            return { success: true, message: data.message || "Sedes obtenidas exitosamente", sedes: data.sedes };
+            // Guardar la sede, usuario y rol en el estado global
+            dispatch(setSede(sede));
+            dispatch(setUsuario(usuario));
+            dispatch(setSedeRol(rol));
+    
+            return { 
+                success: true, 
+                message: data.message || "Información obtenida exitosamente", 
+                geriatrico,
+                sede, 
+                usuario, 
+                rol 
+            };
     
         } catch (error) {
-            console.error("❌ Error al obtener sedes:", error);
+            console.error("❌ Error al obtener datos:", error);
     
-            const errorMessage = error.response?.data?.message || "Error al obtener las sedes";
+            const errorMessage = error.response?.data?.message || "Error al obtener la información";
             dispatch(setSedeError(errorMessage));
     
-            return { success: false, message: errorMessage, sedes: [] };
+            return { success: false, message: errorMessage, sede: null, usuario: null, rol: null , geriatrico: null };
         }
     };
     
-
-    return { obtenerSedesGeriatrico, obtenerSedesInactive, createSede, actualizarSede, reactivarSedes, inactivarSedes, obtenerSedesHome };
+    const obtenerDetalleSede = async (se_id) => {
+        dispatch(startSede());
+        console.log("🔍 Intentando obtener información para la sede...");
+    
+        const token = getToken();
+        if (!token) {
+            const errorMessage = "Token de autenticación no encontrado";
+            dispatch(setSedeError(errorMessage));
+            return { success: false, message: errorMessage, sede: null };
+        }
+    
+        try {
+            // Include the se_id in the API call
+            const { data } = await geriatricoApi.get(`/sedes/${se_id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+    
+            console.log("✅ Respuesta del servidor:", data);
+    
+            return { success: true, message: data.message || "Información obtenida exitosamente", sede: data.sede };
+    
+        } catch (error) {
+            console.error("❌ Error al obtener datos:", error);
+    
+            const errorMessage = error.response?.data?.message || "Error al obtener la información";
+            dispatch(setSedeError(errorMessage));
+    
+            return { success: false, message: errorMessage, sede: null };
+        }
+    }; 
+    return { obtenerSedesGeriatrico, obtenerSedesInactive, createSede, actualizarSede, reactivarSedes, inactivarSedes, obtenerSedesHome, obtenerDetalleSede };
 };

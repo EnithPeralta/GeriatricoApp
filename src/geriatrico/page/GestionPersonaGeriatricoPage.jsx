@@ -5,20 +5,23 @@ import { GoBackButton } from "../components/GoBackButton";
 import Swal from "sweetalert2";
 import { SelectField } from "../../auth/components/SelectField/SelectField";
 import { SelectSede } from "../components/SelectSede/SelectSede";
+import { useGeriatrico } from "../../hooks/useGeriatrico";
 
 export const GestionPersonaGeriatricoPage = () => {
     const [personas, setPersonas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [search, setSearch] = useState("");
-    const { personasVinculadasActivasMiGeriatrico } = useGeriatricoPersona();
+    const { homeMiGeriatrico } = useGeriatrico();
+    const { obtenerPersonaRolesMiGeriatricoSede, personasVinculadasMiGeriatrico, inactivarVinculacionGeriatrico, reactivarVinculacionGeriatrico } = useGeriatricoPersona();
     const { updatePerson } = usePersona();
-    const { asignarRolAdminSede } = useSedesRol();
+    const { asignarRolAdminSede, inactivarRolAdminSede } = useSedesRol();
     const [activeCard, setActiveCard] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedPersona, setSelectedPersona] = useState(null);
     const [showAssignCard, setShowAssignCard] = useState(false);
     const [fechaInicio, setFechaInicio] = useState("");
+    const [geriatrico, setGeriatrico] = useState(null);
     const [fechaFin, setFechaFin] = useState("");
     const [assigning, setAssigning] = useState(false);
     const [selectedRoles, setSelectedRoles] = useState([]);
@@ -26,21 +29,45 @@ export const GestionPersonaGeriatricoPage = () => {
     const [editedPersona, setEditedPersona] = useState({
         usuario: "",
         nombre: "",
+        documento: "",
         correo: "",
         telefono: "",
         genero: "",
         password: "",
-        per_foto: "",
+        foto: "",
     });
     const [roles, setRoles] = useState({ rolesGeriatrico: [], rolesSede: [] });
+
+    useEffect(() => {
+        const fetchSede = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const result = await homeMiGeriatrico();
+                console.log("📡 Respuesta de la API:", result);
+                if (result.success && result.geriatrico) {
+                    setGeriatrico(result.geriatrico);
+                } else {
+                    setError("No se encontraron datos de la sede.");
+                }
+            } catch (err) {
+                setError("Error al obtener los datos.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSede();
+    }, []);
+
 
     useEffect(() => {
         const fetchPersonas = async () => {
             setLoading(true);
             try {
-                const response = await personasVinculadasActivasMiGeriatrico();
-                if (response.success) {
-                    setPersonas(response.personas);
+                const response = await personasVinculadasMiGeriatrico();
+                console.log("Respuesta de la API:", response);
+                if (response && response.success && response.personas && response.personas.data) {
+                    setPersonas(response.personas.data);
                 } else {
                     setError(response.message);
                 }
@@ -54,58 +81,177 @@ export const GestionPersonaGeriatricoPage = () => {
     }, []);
 
     // Filtrar personas por nombre o documento
-    const personasFiltradas = personas.filter(persona =>
-        persona?.per_nombre?.toLowerCase()?.includes(search.toLowerCase()) ||
-        persona?.per_documento?.includes(search)
+    const personasEncontradas = personas.find(personas =>
+        personas?.per_nombre?.toLowerCase()?.includes(search.toLowerCase()) ||
+        personas?.per_documento?.includes(search)
     );
+
+    const personasFiltradas = personasEncontradas ? [personasEncontradas] : [];
 
     const handleCardClick = async (persona) => {
         console.log("Persona seleccionada:", persona);
-    
+
         const isActive = activeCard === persona.per_id ? null : persona.per_id;
         setActiveCard(isActive);
-    
+
         if (isActive) {
             try {
-                const response = await personasVinculadasActivasMiGeriatrico({ per_id: persona.per_id });
+                const response = await obtenerPersonaRolesMiGeriatricoSede(persona.per_id);
                 console.log("Respuesta de la API:", response);
-    
-                if (!response.personas) {
-                    console.warn("⚠️ La API no devolvió personas.");
-                    return;
-                }
-    
-                let personaData;
-                if (Array.isArray(response.personas)) {
-                    // Si es un array, buscamos la persona correcta
-                    personaData = response.personas.find(p => p.per_id === persona.per_id);
+
+                if (response.success) {
+                    // Assuming the response contains the persona object
+                    const { rolesGeriatrico, rolesSede } = response.persona; // Destructure roles from persona
+                    setRoles({
+                        rolesGeriatrico: rolesGeriatrico || [],
+                        rolesSede: rolesSede || []
+                    });
                 } else {
-                    // Si es un objeto, accedemos por ID
-                    personaData = response.personas[persona.per_id];
+                    throw new Error(response.message || "Error al obtener los roles.");
                 }
-    
-                if (!personaData) {
-                    console.warn(`⚠️ No se encontraron datos para persona con ID ${persona.per_id}`);
-                    return;
-                }
-    
-                console.log("Datos de la persona:", personaData);
-    
-                setRoles({
-                    rolesGeriatrico: personaData.rolesGeriatrico || [],
-                    rolesSede: personaData.rolesSede || []
-                });
-    
             } catch (error) {
                 console.error("Error al obtener roles:", error);
+                Swal.fire({
+                    icon: "error",
+                    text: error.message || "Error al obtener los roles."
+                });
             }
         }
     };
-    
+
     const openAssignCard = (persona) => {
         setShowAssignCard(true);
         setSelectedPersona(persona);
     };
+
+    const handleInactivarRolAdminSede = async (persona) => {
+        console.log("Persona seleccionada para inactivar:", persona);
+
+        if (!persona || !persona.per_id) {
+            console.warn("⚠️ Información incompleta para inactivar el rol: falta per_id.");
+            return;
+        }
+
+        if (!persona.rolesSede?.length) {
+            Swal.fire({
+                icon: "warning",
+                text: " La persona no tiene roles en una sede.",
+            });
+            console.warn("⚠️ La persona no tiene roles en una sede.");
+            return;
+        }
+
+        const rolSede = persona.rolesSede[0];
+        console.log("Rol de sede seleccionado:", rolSede);
+
+        if (!rolSede.sede?.id || !rolSede.rol_id) {
+            console.warn("⚠️ Información incompleta: falta sede ID o rol ID.");
+            return;
+        }
+
+        // Convertir valores a números válidos antes de enviarlos
+        const per_id = Number(persona.per_id);
+        const se_id = Number(rolSede.sede.id);
+        const rol_id = Number(rolSede.rol_id);
+
+        if (isNaN(per_id) || isNaN(se_id) || isNaN(rol_id) || per_id <= 0 || se_id <= 0 || rol_id <= 0) {
+            console.error("❌ Error: Uno o más valores no son números válidos:", { per_id, se_id, rol_id });
+            return;
+        }
+
+        const confirmacion = await Swal.fire({
+            text: "Esta acción inactivará el rol de la persona en la sede.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, inactivar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        const resultado = await inactivarRolAdminSede({ per_id, se_id, rol_id });
+
+        if (resultado.success) {
+            Swal.fire({
+                icon: "success",
+                text: resultado.message || "Rol inactivado exitosamente"
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                text: resultado.message || "No se pudo inactivar el rol"
+            });
+        }
+    };
+
+    const handleInactivarVinculacion = async (persona) => {
+        console.log("Persona seleccionada para inactivar:", persona);
+
+        if (!persona || !persona.per_id) {
+            console.warn("⚠️ Información incompleta para inactivar el rol: falta per_id.");
+            return;
+        }
+
+        const confirmacion = await Swal.fire({
+            text: "Deseas inactivará la vinculación de la persona al geriatrico.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, inactivar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        const resultado = await inactivarVinculacionGeriatrico(persona.per_id);
+
+        if (resultado.success) {
+            Swal.fire({
+                icon: "success",
+                text: resultado.message || "Vinculación inactivada exitosamente"
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                text: resultado.message || "No se pudo inactivar la vinculación"
+            });
+        }
+
+    }
+
+    const handleReactivarVinculacion = async (persona) => {
+        console.log("Persona seleccionada para reactivar:", persona);
+
+        if (!persona || !persona.per_id) {
+            console.warn("⚠️ Información incompleta para reactivar el rol: falta per_id.");
+            return;
+        }
+
+        const confirmacion = await Swal.fire({
+            text: "Deseas reactivará la vinculación de la persona al geriatrico.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, reactivar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!confirmacion.isConfirmed) return;
+
+        const resultado = await reactivarVinculacionGeriatrico(persona.per_id);
+
+        if (resultado.success) {
+            Swal.fire({
+                icon: "success",
+                text: resultado.message || "Vinculación reactivada exitosamente"
+            });
+            resetForm();
+        } else {
+            Swal.fire({
+                icon: "error",
+                text: resultado.message || "No se pudo reactivar la vinculación"
+            });
+        }
+
+    }
 
     const handleAssignRole = async () => {
         if (!selectedPersona || selectedSedes.length === 0 || selectedRoles.length === 0 || !fechaInicio) {
@@ -133,7 +279,7 @@ export const GestionPersonaGeriatricoPage = () => {
             }
             Swal.fire({
                 icon: "success",
-                title: "Rol asignado exitosamente",
+                text: "Rol asignado exitosamente",
             });
             resetForm();
         } catch (error) {
@@ -161,11 +307,12 @@ export const GestionPersonaGeriatricoPage = () => {
             id: persona.per_id,
             usuario: persona.per_usuario || "",
             nombre: persona.per_nombre || "",
+            documento: persona.per_documento || "",
             correo: persona.per_correo || "",
             telefono: persona.per_telefono || "",
             genero: persona.per_genero || "",
             password: "", // No se debe prellenar la contraseña por seguridad
-            per_foto: persona.per_foto || "",
+            foto: persona.per_foto || "",
         });
         setShowEditModal(true);
     };
@@ -198,11 +345,12 @@ export const GestionPersonaGeriatricoPage = () => {
             per_id: editedPersona.id,
             per_usuario: editedPersona.usuario,
             per_nombre_completo: editedPersona.nombre,
+            per_documento: editedPersona.documento,
             per_correo: editedPersona.correo,
             per_telefono: editedPersona.telefono,
             per_genero: editedPersona.genero,
             per_password: editedPersona.password,
-            per_foto: editedPersona.per_foto
+            per_foto: editedPersona.foto
         };
 
         console.log("Datos enviados corregidos:", personaActualizada);
@@ -228,9 +376,9 @@ export const GestionPersonaGeriatricoPage = () => {
     };
 
     return (
-        <div className="bodyAsignar">
+        <div className="bodyAsignar" style={{  backgroundColor: geriatrico?.color_principal }}>
             <GoBackButton />
-            <div className="container-asignar">
+            <div className="container-asignar" >
                 <div className="layout-asignar">
                     <div className="content-asignar">
                         <h2 className="title-asignar">Personas Vinculadas</h2>
@@ -248,11 +396,11 @@ export const GestionPersonaGeriatricoPage = () => {
                         ) : error ? (
                             <div className="error">{error}</div>
                         ) : (
-                            <div className="">
+                            <div className="container-cards">
                                 {personasFiltradas.map(persona => (
                                     <div
                                         key={persona.per_id}
-                                        className={`sede-card-asignar ${activeCard === persona.per_id ? "active" : ""}`}
+                                        className={`sede-card-asignar ${activeCard === persona.per_id ? "active" : ""} ${persona.ge_active === false ? "inactive" : ""}`}
                                         onClick={() => handleCardClick(persona)}>
                                         <div className="sede-info">
                                             <div className="full-name">{persona.per_nombre}</div>
@@ -260,72 +408,119 @@ export const GestionPersonaGeriatricoPage = () => {
                                             <div className="CC">{persona.per_documento}</div>
                                             <div className="CC">{persona.gp_fecha_vinculacion}</div>
                                         </div>
+                                        <div className="status-icon-active">
+                                            {persona.gp_activo ? (
+                                                <i className="fa-solid fa-circle-check activo"></i>
+                                            ) : (
+                                                <i className="fa-solid fa-circle-xmark inactivo"></i>
+                                            )}
+                                        </div>
 
-                                        <button className="inactive-button-asignar"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                            }}>
-                                            <i className="fa-solid fa-user-slash" />
-                                        </button>
+                                        <div className="buttons-asignar">
+                                            <button className="active-button-asignar"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleReactivarVinculacion(persona);
+                                                }}>
+                                                <i className="fa-solid fa-user-gear" />
+                                            </button>
 
-                                        <button
-                                            className="edit-button-asignar"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                openEditModal(persona);
-                                            }}
-                                        >
-                                            <i className="fa-solid fa-user-pen i-asignar"></i>
-                                        </button>
+                                            <button
+                                                className="inactive-button-asignar"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleInactivarVinculacion(persona);
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-user-slash" />
+                                            </button>
 
-                                        <button
-                                            className="add-button-asignar"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                openAssignCard(persona);
-                                            }}
-                                        >
-                                            <i className="fas fa-arrow-up i-asignar"></i>
-                                        </button>
+                                            <button
+                                                className="edit-button-asignar"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openEditModal(persona);
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-user-pen i-asignar"></i>
+                                            </button>
+
+                                            <button
+                                                className="add-button-asignar"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openAssignCard(persona);
+                                                }}
+                                            >
+                                                <i className="fas fa-arrow-up i-asignar"></i>
+                                            </button>
+
+                                            <button className="inactive-button-fa "
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleInactivarRolAdminSede(persona);
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-building" />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
 
-                                {activeCard && (
-                                    <div className="sede-card-asignar">
-                                        {roles.rolesGeriatrico.length > 0 || roles.rolesSede.length > 0 ? (
-                                            <>
+                                {activeCard && (() => {
+                                    if (roles.rolesGeriatrico.length === 0 && roles.rolesSede.length === 0) {
+                                        console.log(roles);
+                                        return null;
+                                    }
+                                    return (
+                                        <>
+                                            <div className="">
                                                 {roles.rolesGeriatrico.length > 0 && (
-                                                    <div className="sede-info">
+                                                    <div className="sede-card-asignar">
                                                         {roles.rolesGeriatrico.map((rol, index) => (
-                                                            <div key={index}>
-                                                                <div className="full-name">{rol.nombre}</div>
-                                                                <div className="CC">{rol.geriatrico.nit}</div>
-                                                                <div className="CC">{rol.geriatrico.nombre}</div>
+                                                            <div key={index} className="sede-info">
+                                                                <span className="full-name">{rol.nombre}</span>
+                                                                <span className="CC">{rol.fechaInicio} - {rol.fechaFin}</span>
                                                             </div>
                                                         ))}
                                                     </div>
                                                 )}
+                                            </div>
+
+                                            <div className="sede-card-asignar">
                                                 {roles.rolesSede.length > 0 && (
-                                                    <div>
+                                                    <div className="">
                                                         {roles.rolesSede.map((rol, index) => (
-                                                            <div key={index}>
-                                                                <div className="full-name">{rol.fechaInicio}</div>
-                                                                <div className="CC">{rol.sede?.nombre}</div>
+                                                            <div key={index} className="">
+                                                                <div className="status-icon-active-sede">
+                                                                    {rol.activo ? (
+                                                                        <i className="fa-solid fa-circle-check activo"></i>
+                                                                    ) : (
+                                                                        <i className="fa-solid fa-circle-xmark inactivo"></i>
+                                                                    )}
+                                                                </div>
+                                                                <div className="sede-info">
+                                                                    <span className="full-name">{rol.rol_nombre}</span>
+                                                                    <span className="CC">{rol.se_nombre}</span>
+                                                                    <span className="CC">{rol.fechaInicio} - {rol.fechaFin ? rol.fechaFin : "Indefinido"}</span>
+                                                                </div>
                                                             </div>
                                                         ))}
                                                     </div>
                                                 )}
-                                            </>
-                                        ) : (
-                                            <div className="no-roles">⚠️ No tiene roles asignados.</div>
-                                        )}
-                                    </div>
-                                )}
+                                            </div>
+                                        </>
+                                    );
+                                })()}
 
                                 {showAssignCard && selectedPersona?.per_id && (
                                     <div className="sede-card-asignar">
                                         <SelectField name="rol_id" value={selectedRoles} onChange={(roles) => setSelectedRoles(roles.map(Number))} />
-                                        <SelectSede name="se_id" value={selectedSedes} onChange={(e)=> setSelectedSedes(Number(e.target.value))} />
+                                        {
+                                            selectedRoles.includes(3) && (
+                                                <SelectSede name="se_id" value={selectedSedes} onChange={(e) => setSelectedSedes(Number(e.target.value))} />
+                                            )
+                                        }
                                         <div className="form-group">
                                             <label>Fecha de Inicio:</label>
                                             <input
@@ -351,45 +546,58 @@ export const GestionPersonaGeriatricoPage = () => {
                                 )}
 
                                 {showEditModal && editedPersona && (
-                                    <div className="modal">
-                                        <div className="modal-content">
-                                            <h3>Editar Persona</h3>
-                                            <form onSubmit={handleEditSubmit}>
-                                                <div className="modal-picture">
-                                                    {editedPersona.per_foto ? (
-                                                        <img src={editedPersona.per_foto} alt="Foto de perfil" className="modal-img" />
-                                                    ) : (
-                                                        <i className="fas fa-user-circle"></i>
-                                                    )}
-                                                </div>
+                                    <div className="modal-overlay">
+                                        <div className="modal">
+                                            <div className="modal-content">
+                                                <form onSubmit={handleEditSubmit}>
+                                                    <div className="modal-picture">
+                                                        {editedPersona.foto ? (
+                                                            <img src={editedPersona.foto} alt="Foto de perfil" className="" />
+                                                        ) : (
+                                                            <i className="fas fa-user-circle icon-edit-user" ></i>
+                                                        )}
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Cambiar foto:</label>
+                                                        <input className="modal-input" type="file" name="foto" accept="image/*" onChange={handleFileChange} />
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Usuario:</label>
+                                                        <input className="modal-input" type="text" name="usuario" value={editedPersona.usuario} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Nombre Completo:</label>
+                                                        <input className="modal-input" type="text" name="nombre" value={editedPersona.nombre} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Documento:</label>
+                                                        <input className="modal-input" type="text" name="documento" value={editedPersona.documento} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Correo:</label>
+                                                        <input className="modal-input" type="email" name="correo" value={editedPersona.correo} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Teléfono:</label>
+                                                        <input className="modal-input" type="text" name="telefono" value={editedPersona.telefono} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-field">
 
-                                                <label className="modal-label">Cambiar foto:</label>
-                                                <input className="modal-input" type="file" name="foto" accept="image/*" onChange={handleFileChange} />
-
-                                                <label className="modal-label">Usuario:</label>
-                                                <input className="modal-input" type="text" name="usuario" value={editedPersona.usuario} onChange={handleEditChange} required />
-
-                                                <label className="modal-label">Nombre Completo:</label>
-                                                <input className="modal-input" type="text" name="nombre" value={editedPersona.nombre} onChange={handleEditChange} required />
-
-                                                <label className="modal-label">Correo:</label>
-                                                <input className="modal-input" type="email" name="correo" value={editedPersona.correo} onChange={handleEditChange} required />
-
-                                                <label className="modal-label">Teléfono:</label>
-                                                <input className="modal-input" type="text" name="telefono" value={editedPersona.telefono} onChange={handleEditChange} required />
-
-                                                <label className="modal-label">Género:</label>
-                                                <input className="modal-input" type="text" name="genero" value={editedPersona.genero} onChange={handleEditChange} required />
-
-                                                <label className="modal-label">Contraseña:</label>
-                                                <input className="modal-input" type="password" name="password" value={editedPersona.password} onChange={handleEditChange} required />
-
-                                                <div className="modal-buttons">
-                                                    <button type="submit" className="btn-save">Guardar</button>
-                                                    <button type="button" className="btn-cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
-                                                </div>
-                                            </form>
+                                                        <label >Género:</label>
+                                                        <input className="modal-input" type="text" name="genero" value={editedPersona.genero} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-field">
+                                                        <label >Contraseña:</label>
+                                                        <input className="modal-input" type="password" name="password" value={editedPersona.password} onChange={handleEditChange} required />
+                                                    </div>
+                                                    <div className="modal-buttons">
+                                                        <button type="submit" className="create">Guardar</button>
+                                                        <button type="button" className="cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         </div>
+
                                     </div>
                                 )}
                             </div>
@@ -397,6 +605,6 @@ export const GestionPersonaGeriatricoPage = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
