@@ -135,6 +135,7 @@ export const useSedesRol = () => {
     const asignarRolesSede = async ({ per_id, rol_id, sp_fecha_inicio, sp_fecha_fin }) => {
         console.log("📤 Enviando datos para asignar roles a la sede:", { per_id, rol_id, sp_fecha_inicio, sp_fecha_fin });
     
+        // Obtener el token
         const token = getToken();
         if (!token) {
             return {
@@ -142,18 +143,21 @@ export const useSedesRol = () => {
                 message: "🔒 Token de autenticación no encontrado.",
             };
         }
+
+        const rol_id_final = Array.isArray(rol_id) ? rol_id[0] : rol_id;
+
     
+        // Validar datos obligatorios
         if (!per_id || !rol_id || !sp_fecha_inicio) {
             return {
                 success: false,
                 message: "❗ Faltan datos obligatorios para asignar el rol.",
             };
         }
-    
+
         try {
-            const { data } = await geriatricoApi.post(
-                "/sedepersonarol/asignarRolesSede",
-                { per_id, rol_id, sp_fecha_inicio, sp_fecha_fin: sp_fecha_fin || null },
+            const { data } = await geriatricoApi.post("/sedepersonarol/asignarRolSede",
+                { per_id, rol_id: rol_id_final, sp_fecha_inicio, sp_fecha_fin: sp_fecha_fin || null },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -164,7 +168,7 @@ export const useSedesRol = () => {
     
             console.log("✅ Respuesta del servidor:", data);
             console.log("---------------------------------");
-
+    
             return {
                 success: true,
                 message: data.message || "Rol asignado correctamente.",
@@ -179,6 +183,8 @@ export const useSedesRol = () => {
             let errorMessage = "Error al asignar el rol a la sede.";
             if (error.response) {
                 errorMessage = error.response.data?.message || errorMessage;
+            } else if (error.request) {
+                errorMessage = "No se pudo conectar con el servidor.";
             }
     
             return {

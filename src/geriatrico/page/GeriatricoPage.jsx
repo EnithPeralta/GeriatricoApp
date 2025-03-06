@@ -4,7 +4,7 @@ import { CargandoComponent, ModalCrearGeriatrico, ModalEditarGeriatrico, ModalGe
 import Swal from "sweetalert2";
 import '../../css/geriatrico.css';
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "../../hooks";
+import { useAuthStore, useRoles } from "../../hooks";
 
 export const GeriatricosPage = () => {
     const navigate = useNavigate();
@@ -41,6 +41,13 @@ export const GeriatricosPage = () => {
     const handleViewDetails = (geriatrico) => {
         setSelectedGeriatrico(geriatrico);
         setIsModalOpen(true);
+    };
+
+
+    const handleHistorialGeriatrico = (geriatrico) => {
+        if (!geriatrico || !geriatrico.ge_id) return;
+        navigate(`/geriatrico/historial/${geriatrico.ge_id}`);
+        console.log("Historial del geriátrico:", geriatrico);
     };
 
     const handleEditGeriatrico = (geriatrico) => {
@@ -123,7 +130,7 @@ export const GeriatricosPage = () => {
                     icon: "success",
                     text: "El geriátrico ha sido reactivado correctamente."
                 });
-                setGeriatricoInactive((prev) => prev.filter(g => g.ge_id !== ge_id)); // Remueve el geriátrico de la lista
+                setGeriatricos((prev) => prev.filter(g => g.ge_id !== ge_id)); // Remueve el geriátrico de la lista
             } else {
                 Swal.fire("Error", result.message, "error");
             }
@@ -200,6 +207,10 @@ export const GeriatricosPage = () => {
                                         )}
                                     </div>
                                     <button className="details-button" onClick={() => handleViewDetails(geriatrico)}>Ver Sedes</button>
+
+                                    <button className="details" onClick={() => handleHistorialGeriatrico(geriatrico)}>
+                                        Ver Historia
+                                    </button>
                                     <div className="actions">
                                         <button
                                             className={`toggle-button ${geriatrico.ge_activo ? 'active' : 'inactive'}`}

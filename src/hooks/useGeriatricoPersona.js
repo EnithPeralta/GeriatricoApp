@@ -2,41 +2,41 @@ import geriatricoApi from "../api/geriatricoApi";
 import { getToken } from "../helpers/getToken";
 
 export const useGeriatricoPersona = () => {
-    const vincularPersonaAGeriatrico = async (per_id) => {
-        const token = getToken();
+    // const vincularPersonaAGeriatrico = async (per_id) => {
+    //     const token = getToken();
 
-        if (!token) {
-            return {
-                success: false,
-                message: "Token de autenticación no encontrado.",
-            };
-        }
+    //     if (!token) {
+    //         return {
+    //             success: false,
+    //             message: "Token de autenticación no encontrado.",
+    //         };
+    //     }
 
-        try {
-            const response = await geriatricoApi.post("/geriatricopersona/vincular",
-                { per_id },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+    //     try {
+    //         const response = await geriatricoApi.post("/geriatricopersona/vincular",
+    //             { per_id },
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                     "Content-Type": "application/json",
+    //                 },
+    //             }
+    //         );
 
-            return {
-                success: true,
-                message: response.data.message || "Persona vinculada con éxito a la geriatría.",
-            };
+    //         return {
+    //             success: true,
+    //             message: response.data.message || "Persona vinculada con éxito a la geriatría.",
+    //         };
 
-        } catch (error) {
-            console.error("Error al vincular persona a geriatría:", error.response || error.message);
-            return {
-                success: false,
-                message: error.response?.data?.message || "Error al vincular la persona a la geriatría.",
-                error: error.response?.data || error.message,
-            };
-        }
-    };
+    //     } catch (error) {
+    //         console.error("Error al vincular persona a geriatría:", error.response || error.message);
+    //         return {
+    //             success: false,
+    //             message: error.response?.data?.message || "Error al vincular la persona a la geriatría.",
+    //             error: error.response?.data || error.message,
+    //         };
+    //     }
+    // };
 
     const obtenerPersonaRolesMiGeriatricoSede = async (per_id) => {
         const token = getToken();
@@ -54,7 +54,6 @@ export const useGeriatricoPersona = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("Respuesta de la API Roles:", response);
 
             return {
                 success: true,
@@ -121,6 +120,7 @@ export const useGeriatricoPersona = () => {
                 },
             });
 
+            console.log("Respuesta de la API:", response.data);
             return {
                 success: true,
                 status: response.status,
@@ -179,7 +179,7 @@ export const useGeriatricoPersona = () => {
     };
 
     return {
-        vincularPersonaAGeriatrico,
+        // vincularPersonaAGeriatrico,
         obtenerPersonaRolesMiGeriatricoSede,
         personasVinculadasMiGeriatrico,
         inactivarVinculacionGeriatrico,

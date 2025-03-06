@@ -1,18 +1,30 @@
-import { useState } from "react";
-import '../../../css/modal.css';
+import { useState, useEffect } from "react";
 
 export const ModalUpdatePerson = ({ persona, updatePersona, setPersona, showModal, setShowModal }) => {
     const [editedPersona, setEditedPersona] = useState({
-        per_usuario: persona?.usuario || "",
-        per_correo: persona?.correo || "",
-        per_telefono: persona?.telefono || "",
-        per_foto: persona?.foto || "",
+        usuario: "",
+        correo: "",
+        telefono: "",
+        foto: "",
     });
+
+    // Sincronizar el estado con `persona`
+    useEffect(() => {
+        if (persona) {
+            setEditedPersona({
+                usuario: persona.usuario || "",
+                correo: persona.correo || "",
+                telefono: persona.telefono || "",
+                foto: persona.foto || "",
+            });
+        }
+    }, [persona]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setEditedPersona((prev) => ({ ...prev, [name]: value }));
     };
+
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -20,13 +32,12 @@ export const ModalUpdatePerson = ({ persona, updatePersona, setPersona, showModa
             reader.onloadend = () => {
                 setEditedPersona((prev) => ({
                     ...prev,
-                    per_foto: reader.result, // Guardamos la imagen en base64
+                    foto: reader.result, // Guardamos la imagen en base64
                 }));
             };
             reader.readAsDataURL(file);
         }
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,12 +57,10 @@ export const ModalUpdatePerson = ({ persona, updatePersona, setPersona, showModa
         <div className="modal-overlay">
             <div className="modal">
                 <div className="modal-content">
-
-                    <p className="">Editar Perfil</p>
                     <form onSubmit={handleSubmit}>
-                        <div className="modal-picture">
-                            {editedPersona.per_foto ? (
-                                <img src={editedPersona.per_foto} alt="Foto de perfil" className="modal-img" />
+                        <div className="profile-img">
+                            {editedPersona.foto ? (
+                                <img src={editedPersona.foto} alt="Foto de perfil" height="100px" width="100px" />
                             ) : (
                                 <i className="fas fa-user-circle"></i>
                             )}
@@ -62,22 +71,21 @@ export const ModalUpdatePerson = ({ persona, updatePersona, setPersona, showModa
                         </div>
                         <div className="modal-field">
                             <label className="modal-label">Usuario:</label>
-                            <input className="modal-input" type="text" name="per_usuario" value={editedPersona.per_usuario} onChange={handleChange} required />
+                            <input className="modal-input" type="text" name="usuario" value={editedPersona.usuario} onChange={handleChange} required />
                         </div>
                         <div className="modal-field">
                             <label className="modal-label">Correo:</label>
-                            <input className="modal-input" type="email" name="per_correo" value={editedPersona.per_correo} onChange={handleChange} required />
+                            <input className="modal-input" type="email" name="correo" value={editedPersona.correo} onChange={handleChange} required />
                         </div>
                         <div className="modal-field">
                             <label className="modal-label">Teléfono:</label>
-                            <input className="modal-input" type="text" name="per_telefono" value={editedPersona.per_telefono} onChange={handleChange} required />
+                            <input className="modal-input" type="text" name="telefono" value={editedPersona.telefono} onChange={handleChange} required />
                         </div>
                         <div className="modal-buttons">
                             <button type="submit" className="create">Guardar</button>
                             <button type="button" className="cancel" onClick={() => setShowModal(false)}>Cancelar</button>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

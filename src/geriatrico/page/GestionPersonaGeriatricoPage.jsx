@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 import { useGeriatricoPersona } from "../../hooks/useGeriatricoPersona";
-import { usePersona, useSedesRol } from "../../hooks";
+import { useEnfermera, usePaciente, usePersona, useSedesRol } from "../../hooks";
 import { GoBackButton } from "../components/GoBackButton";
 import Swal from "sweetalert2";
-import { SelectField } from "../../auth/components/SelectField/SelectField";
-import { SelectSede } from "../components/SelectSede/SelectSede";
 import { useGeriatrico } from "../../hooks/useGeriatrico";
+import { CardPerson } from "../components/CardPerson";
+import { AssignCard } from "../components/AssignCard";
+import { ModalEditPerson } from "../components/ModalEditPerson";
+import { ModalRegistrarPaciente } from "../components/ModalRegistrarPaciente ";
+import { PersonList } from "../components/PersonList";
+import { ModalEnfermera } from "../components/ModalEnfermera";
 
 export const GestionPersonaGeriatricoPage = () => {
-    const [personas, setPersonas] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [search, setSearch] = useState("");
+    const { registrarPaciente } = usePaciente();
     const { homeMiGeriatrico } = useGeriatrico();
     const { obtenerPersonaRolesMiGeriatricoSede, personasVinculadasMiGeriatrico, inactivarVinculacionGeriatrico, reactivarVinculacionGeriatrico } = useGeriatricoPersona();
     const { updatePerson } = usePersona();
-    const { asignarRolAdminSede, inactivarRolAdminSede } = useSedesRol();
+    const { asignarRolAdminSede, inactivarRolAdminSede, asignarRolesSede } = useSedesRol();
+    const { startRegisterEnfermera } = useEnfermera();
+    const [personas, setPersonas] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [activeCard, setActiveCard] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedPersona, setSelectedPersona] = useState(null);
@@ -24,8 +28,12 @@ export const GestionPersonaGeriatricoPage = () => {
     const [geriatrico, setGeriatrico] = useState(null);
     const [fechaFin, setFechaFin] = useState("");
     const [assigning, setAssigning] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [showModalEnfermera, setShowModalEnfermera] = useState(false);
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [selectedSedes, setSelectedSedes] = useState("");
+    const [error, setError] = useState("");
+    const [search, setSearch] = useState("");
     const [editedPersona, setEditedPersona] = useState({
         usuario: "",
         nombre: "",
@@ -36,6 +44,7 @@ export const GestionPersonaGeriatricoPage = () => {
         password: "",
         foto: "",
     });
+
     const [roles, setRoles] = useState({ rolesGeriatrico: [], rolesSede: [] });
 
     useEffect(() => {
@@ -65,7 +74,6 @@ export const GestionPersonaGeriatricoPage = () => {
             setLoading(true);
             try {
                 const response = await personasVinculadasMiGeriatrico();
-                console.log("Respuesta de la API:", response);
                 if (response && response.success && response.personas && response.personas.data) {
                     setPersonas(response.personas.data);
                 } else {
@@ -81,12 +89,10 @@ export const GestionPersonaGeriatricoPage = () => {
     }, []);
 
     // Filtrar personas por nombre o documento
-    const personasEncontradas = personas.find(personas =>
+    const personasFiltradas = personas.filter(personas =>
         personas?.per_nombre?.toLowerCase()?.includes(search.toLowerCase()) ||
         personas?.per_documento?.includes(search)
     );
-
-    const personasFiltradas = personasEncontradas ? [personasEncontradas] : [];
 
     const handleCardClick = async (persona) => {
         console.log("Persona seleccionada:", persona);
@@ -254,9 +260,151 @@ export const GestionPersonaGeriatricoPage = () => {
     }
 
 
+    const handlePaciente = async (datosPaciente) => {
+        if (!datosPaciente || !datosPaciente.per_id) {
+            Swal.fire({
+                icon: 'warning',
+                text: "⚠️ No se ha seleccionado una persona válida.",
+            });
+            return;
+        }
+
+        console.log("📤 Enviando datos del paciente:", datosPaciente);
+
+        try {
+            const response = await registrarPaciente(datosPaciente);
+
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    text: response.message,
+                });
+                setShowModal(false);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    text: response.message,
+                });
+            }
+        } catch (error) {
+            console.error("❌ Error al registrar paciente:", error);
+
+            let errorMessage = "Ocurrió un error inesperado. Inténtalo nuevamente.";
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.request) {
+                errorMessage = "No se pudo conectar con el servidor.";
+            }
+
+            Swal.fire({
+                icon: 'error',
+                text: errorMessage,
+            });
+        }
+    };
+
+    const handleEnfermera = async (datosEnfermera) => {
+        if (!datosEnfermera.per_id) {
+            Swal.fire({
+                icon: 'warning',
+                text: "⚠️ No se ha seleccionado una persona válida.",
+            });
+            return;
+        }
+
+        console.log("📤 Enviando datos de la enfermera:", datosEnfermera)
+
+        try {
+            const response = await startRegisterEnfermera(datosEnfermera);
+            console.log(response);
+
+            Swal.fire({
+                icon: response.success ? 'success' : 'error',
+                text: response.message,
+            });
+
+            if (response.success) {
+                setShowModal(false); // Cierra el modal si el registro es exitoso
+            } else {
+                console.error("❌ Error al registrar enfermera:", response.message);
+            }
+        } catch (error) {
+            console.error("❌ Error al registrar enfermera:", error);
+            let errorMessage = "Ocurrido un error inesperado. Inténtalo nuevamente.";
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.request) {
+                errorMessage = "No se pudo conectar con el servidor.";
+            }
+
+            Swal.fire({
+                icon: 'error',
+                text: errorMessage,
+            })
+        }
+    };
+
+    const handleAssignSedes = async () => {
+        try {
+            // Validar que los valores requeridos estén presentes
+            if (!selectedPersona?.per_id || !selectedRoles || !fechaInicio) {
+                console.warn("❌ Datos incompletos para la asignación del rol.");
+                await Swal.fire({
+                    icon: "warning",
+                    text: "Por favor, complete todos los campos obligatorios antes de asignar el rol."
+                });
+                return;
+            }
+
+            // Enviar solicitud para asignar rol
+            const response = await asignarRolesSede({
+                per_id: selectedPersona.per_id,
+                rol_id: selectedRoles,
+                sp_fecha_inicio: fechaInicio,
+                sp_fecha_fin: fechaFin || null,
+            });
+
+            // Manejo de la respuesta del servidor
+            if (response?.success) {
+                console.log("✅ Rol asignado con éxito:", response.message);
+                await Swal.fire({
+                    icon: "success",
+                    text: response.message
+                });
+
+                // Si el rol asignado es "Paciente", mostrar mensaje adicional y abrir modal
+                if (response.rolNombre === "Paciente" && response.mensajeAdicional) {
+                    await Swal.fire({
+                        icon: "info",
+                        text: response.mensajeAdicional,
+                    });
+                    setShowModal(true);
+                }
+                if (response.rolNombre === "Enfermera(O)" && response.mensajeAdicional) {
+                    await Swal.fire({
+                        icon: "info",
+                        text: response.mensajeAdicional,
+                    })
+                    setShowModalEnfermera(true);
+                }
+            } else {
+                console.warn("⚠️ Error en la asignación del rol:", response?.message || "Error desconocido.");
+                await Swal.fire({
+                    icon: "error",
+                    text: response?.message || "Hubo un problema al asignar el rol."
+                });
+            }
+        } catch (error) {
+            console.error("❌ Error inesperado al asignar el rol:", error);
+            await Swal.fire({
+                icon: "error",
+                text: error?.message || "Ocurrió un error inesperado. Inténtelo nuevamente."
+            });
+        }
+    };
+
     const handleAssignRole = async () => {
-        if (!selectedPersona || selectedSedes.length === 0 || selectedRoles.length === 0 || !fechaInicio) {
-            console.log("Validación fallida: ", selectedRoles, selectedSedes, selectedPersona, fechaInicio, fechaFin);
+        if (!selectedPersona || !selectedSedes || selectedRoles.length === 0 || !fechaInicio) {
             Swal.fire({
                 icon: "error",
                 text: "Debe seleccionar al menos una sede y un rol, y definir la fecha de inicio.",
@@ -273,15 +421,22 @@ export const GestionPersonaGeriatricoPage = () => {
                     sp_fecha_inicio: fechaInicio,
                     sp_fecha_fin: fechaFin || null,
                 });
+
                 console.log("Respuesta del servidor:", response);
+
                 if (!response.success) {
                     throw new Error(response.message);
                 }
+
+                // ✅ Mostrar el modal si el rol asignado es "Paciente"
+                if (response.rolNombre === "Paciente") {
+                    Swal.fire({
+                        icon: "success",
+                        text: response.mensajeAdicional,
+                    });
+                    setShowModal(true);
+                }
             }
-            Swal.fire({
-                icon: "success",
-                text: "Rol asignado exitosamente",
-            });
             resetForm();
         } catch (error) {
             console.error("Error al asignar rol:", error);
@@ -318,40 +473,23 @@ export const GestionPersonaGeriatricoPage = () => {
         setShowEditModal(true);
     };
 
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        setEditedPersona(prev => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setEditedPersona(prev => ({ ...prev, per_foto: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
 
-    const handleEditSubmit = async (e) => {
-        e.preventDefault();
+    const handleEditSubmit = async (e, datosPersona) => {
+        e.preventDefault(); // Evita que el formulario recargue la página
 
-        if (!editedPersona) return;
+        if (!datosPersona) return;
 
         const personaActualizada = {
-            per_id: editedPersona.id,
-            per_usuario: editedPersona.usuario,
-            per_nombre_completo: editedPersona.nombre,
-            per_documento: editedPersona.documento,
-            per_correo: editedPersona.correo,
-            per_telefono: editedPersona.telefono,
-            per_genero: editedPersona.genero,
-            per_password: editedPersona.password,
-            per_foto: editedPersona.foto
+            per_id: datosPersona.id,
+            per_usuario: datosPersona.usuario,
+            per_nombre_completo: datosPersona.nombre,
+            per_documento: datosPersona.documento,
+            per_correo: datosPersona.correo,
+            per_telefono: datosPersona.telefono,
+            per_genero: datosPersona.genero,
+            per_password: datosPersona.password,
+            per_foto: datosPersona.foto
         };
 
         console.log("Datos enviados corregidos:", personaActualizada);
@@ -376,10 +514,15 @@ export const GestionPersonaGeriatricoPage = () => {
         }
     };
 
+
+    if (loading) {
+        <span className="loader" />
+    }
+
     return (
-        <div className="bodyAsignar" style={{  backgroundColor: geriatrico?.color_principal }}>
+        <div className="bodyAsignar" style={{ backgroundColor: geriatrico?.color_principal }}>
             <GoBackButton />
-            <div className="container-asignar" >
+            <div className="container-asignar">
                 <div className="layout-asignar">
                     <div className="content-asignar">
                         <h2 className="title-asignar">Personas Vinculadas</h2>
@@ -393,219 +536,68 @@ export const GestionPersonaGeriatricoPage = () => {
                             />
                         </div>
                         {loading ? (
-                            <div className="loader"></div>
+                            <span className="loader" />
                         ) : error ? (
                             <div className="error">{error}</div>
                         ) : (
                             <div className="container-cards">
-                                {personasFiltradas.map(persona => (
-                                    <div
-                                        key={persona.per_id}
-                                        className={`sede-card-asignar ${activeCard === persona.per_id ? "active" : ""} ${persona.ge_active === false ? "inactive" : ""}`}
-                                        onClick={() => handleCardClick(persona)}>
-                                        <div className="sede-info">
-                                            <div className="full-name">{persona.per_nombre}</div>
-                                            <div className="CC">{persona.per_usuario}</div>
-                                            <div className="CC">{persona.per_documento}</div>
-                                            <div className="CC">{persona.gp_fecha_vinculacion}</div>
-                                        </div>
-                                        <div className="status-icon-active">
-                                            {persona.gp_activo ? (
-                                                <i className="fa-solid fa-circle-check activo"></i>
-                                            ) : (
-                                                <i className="fa-solid fa-circle-xmark inactivo"></i>
-                                            )}
-                                        </div>
-
-                                        <div className="buttons-asignar">
-                                            <button className="active-button-asignar"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleReactivarVinculacion(persona);
-                                                }}>
-                                                <i className="fa-solid fa-user-gear" />
-                                            </button>
-
-                                            <button
-                                                className="inactive-button-asignar"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleInactivarVinculacion(persona);
-                                                }}
-                                            >
-                                                <i className="fa-solid fa-user-slash" />
-                                            </button>
-
-                                            <button
-                                                className="edit-button-asignar"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openEditModal(persona);
-                                                }}
-                                            >
-                                                <i className="fa-solid fa-user-pen i-asignar"></i>
-                                            </button>
-
-                                            <button
-                                                className="add-button-asignar"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openAssignCard(persona);
-                                                }}
-                                            >
-                                                <i className="fas fa-arrow-up i-asignar"></i>
-                                            </button>
-
-                                            <button className="inactive-button-fa "
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleInactivarRolAdminSede(persona);
-                                                }}
-                                            >
-                                                <i className="fa-solid fa-building" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {activeCard && (() => {
-                                    if (roles.rolesGeriatrico.length === 0 && roles.rolesSede.length === 0) {
-                                        console.log(roles);
-                                        return null;
-                                    }
-                                    return (
-                                        <>
-                                            <div className="">
-                                                {roles.rolesGeriatrico.length > 0 && (
-                                                    <div className="sede-card-asignar">
-                                                        {roles.rolesGeriatrico.map((rol, index) => (
-                                                            <div key={index} className="sede-info">
-                                                                <span className="full-name">{rol.nombre}</span>
-                                                                <span className="CC">{rol.fechaInicio} - {rol.fechaFin}</span>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="sede-card-asignar">
-                                                {roles.rolesSede.length > 0 && (
-                                                    <div className="">
-                                                        {roles.rolesSede.map((rol, index) => (
-                                                            <div key={index} className="">
-                                                                <div className="status-icon-active-sede">
-                                                                    {rol.activo ? (
-                                                                        <i className="fa-solid fa-circle-check activo"></i>
-                                                                    ) : (
-                                                                        <i className="fa-solid fa-circle-xmark inactivo"></i>
-                                                                    )}
-                                                                </div>
-                                                                <div className="sede-info">
-                                                                    <span className="full-name">{rol.rol_nombre}</span>
-                                                                    <span className="CC">{rol.se_nombre}</span>
-                                                                    <span className="CC">{rol.fechaInicio} - {rol.fechaFin ? rol.fechaFin : "Indefinido"}</span>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </>
-                                    );
-                                })()}
+                                <PersonList
+                                    personasFiltradas={personasFiltradas}
+                                    activeCard={activeCard}
+                                    handleCardClick={handleCardClick}
+                                    openEditModal={openEditModal}
+                                    openAssignCard={openAssignCard}
+                                    handleInactivarVinculacion={handleInactivarVinculacion}
+                                    handleReactivarVinculacion={handleReactivarVinculacion}
+                                    roles={roles}
+                                />
 
                                 {showAssignCard && selectedPersona?.per_id && (
-                                    <div className="sede-card-asignar">
-                                        <SelectField name="rol_id" value={selectedRoles} onChange={(roles) => setSelectedRoles(roles.map(Number))} />
-                                        {
-                                            selectedRoles.includes(3) && (
-                                                <SelectSede name="se_id" value={selectedSedes} onChange={(e) => setSelectedSedes(Number(e.target.value))} />
-                                            )
-                                        }
-                                        <div className="form-group">
-                                            <label>Fecha de Inicio:</label>
-                                            <input
-                                                type="date"
-                                                value={fechaInicio}
-                                                className="date-input"
-                                                onChange={(e) => setFechaInicio(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Fecha de Fin (opcional):</label>
-                                            <input
-                                                type="date"
-                                                className="date-input"
-                                                value={fechaFin}
-                                                onChange={(e) => setFechaFin(e.target.value)}
-                                            />
-                                        </div>
-                                        <button className="asignar-button" onClick={handleAssignRole} disabled={assigning}>
-                                            {assigning ? "Asignando..." : "Asignar"}
-                                        </button>
-                                    </div>
+                                    <AssignCard
+                                        selectedRoles={selectedRoles}
+                                        setSelectedRoles={setSelectedRoles}
+                                        selectedSedes={selectedSedes}
+                                        setSelectedSedes={setSelectedSedes}
+                                        fechaInicio={fechaInicio}
+                                        setFechaInicio={setFechaInicio}
+                                        fechaFin={fechaFin}
+                                        setFechaFin={setFechaFin}
+                                        assigning={assigning}
+                                        handleAssignRole={handleAssignRole}
+                                        handleAssignSedes={handleAssignSedes}
+                                        onClose={resetForm}
+                                    />
                                 )}
-
                                 {showEditModal && editedPersona && (
-                                    <div className="modal-overlay">
-                                        <div className="modal">
-                                            <div className="modal-content">
-                                                <form onSubmit={handleEditSubmit}>
-                                                    <div className="modal-picture">
-                                                        {editedPersona.foto ? (
-                                                            <img src={editedPersona.foto} alt="Foto de perfil" className="" />
-                                                        ) : (
-                                                            <i className="fas fa-user-circle icon-edit-user" ></i>
-                                                        )}
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Cambiar foto:</label>
-                                                        <input className="modal-input" type="file" name="foto" accept="image/*" onChange={handleFileChange} />
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Usuario:</label>
-                                                        <input className="modal-input" type="text" name="usuario" value={editedPersona.usuario} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Nombre Completo:</label>
-                                                        <input className="modal-input" type="text" name="nombre" value={editedPersona.nombre} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Documento:</label>
-                                                        <input className="modal-input" type="text" name="documento" value={editedPersona.documento} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Correo:</label>
-                                                        <input className="modal-input" type="email" name="correo" value={editedPersona.correo} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Teléfono:</label>
-                                                        <input className="modal-input" type="text" name="telefono" value={editedPersona.telefono} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-field">
-
-                                                        <label >Género:</label>
-                                                        <input className="modal-input" type="text" name="genero" value={editedPersona.genero} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-field">
-                                                        <label >Contraseña:</label>
-                                                        <input className="modal-input" type="password" name="password" value={editedPersona.password} onChange={handleEditChange} required />
-                                                    </div>
-                                                    <div className="modal-buttons">
-                                                        <button type="submit" className="create">Guardar</button>
-                                                        <button type="button" className="cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-
-                                    </div>
+                                    <ModalEditPerson
+                                        editedPersona={editedPersona}
+                                        onSubmit={handleEditSubmit}
+                                        onClose={() => setShowEditModal(false)}
+                                    />
+                                )}
+                                {showModal && selectedPersona && (
+                                    <ModalRegistrarPaciente
+                                        datosIniciales={selectedPersona}
+                                        onRegister={handlePaciente}
+                                        onClose={() => setShowModal(false)}
+                                        selectedRoles={selectedRoles}
+                                        setSelectedRoles={setSelectedRoles}
+                                    />
+                                )}
+                                {showModalEnfermera && selectedPersona && (
+                                    <ModalEnfermera
+                                        datosInicial={selectedPersona}
+                                        onRegistrar={handleEnfermera}
+                                        onClose={() => setShowModalEnfermera(false)}
+                                        selectedRoles={selectedRoles}
+                                        setSelectedRoles={setSelectedRoles}
+                                    />
                                 )}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };

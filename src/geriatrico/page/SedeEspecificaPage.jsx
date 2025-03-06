@@ -83,9 +83,19 @@ export const SedeEspecificaPage = () => {
                 </div>
             </div>
             <div className="main-content">
-                <div className="">
-                    <div className="">
-                        <span>{sede.se_nombre}</span>
+                <span className="sede-name">{sede.se_nombre}</span>
+                <div className="grid">
+                    <div className="grid-item-sede" onClick={() => navigate("/geriatrico/pacientes") }>
+                        <div className="sede-title">Paciente</div>
+                    </div>
+                    <div className="grid-item-sede" onClick={() => navigate("/geriatrico/enfermeras") }>
+                        <div className="sede-title">Enfermera(O)</div>
+                    </div>
+                    <div className="grid-item-sede">
+                        <div className="sede-title">Acudiente</div>
+                    </div>
+                    <div className="grid-item-sede">
+                        <div className="sede-title">Colaborador</div>
                     </div>
                 </div>
             </div>

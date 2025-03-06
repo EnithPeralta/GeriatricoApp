@@ -160,6 +160,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .grid-item img {
@@ -200,6 +202,12 @@
 
 .actions .toggle-button .edit-button-sedes{
     background: rgba(0, 0, 0, 1);
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .edit-button-sedes {
@@ -248,8 +256,24 @@
 .color-boxes {
   display: flex;
   justify-content: center;
+  text-align: center;
   gap: 8px;
   margin-bottom: 15px;
+}
+
+.color-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+}
+.color-option {
+  text-align: center;
+}
+
+.color-option .color-label {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 100;
 }
 
 .color-box {
@@ -304,7 +328,6 @@
   max-height: 80vh; /* No ocupar más del 80% de la altura de la pantalla */
   overflow-y: auto; /* Habilita el scroll si hay mucho contenido */
 }
-
 
 .geriatrico-logo{
   padding: 1rem;
@@ -368,8 +391,10 @@
 .color-input{
   width: 40px; /* Tamaño más grande para mejor interacción */
   height: 40px;
-  border-radius: 50%; /* Más cuadrado pero con bordes redondeados */
   outline: none;
+  border-width:0;
+  padding: 0px;
+  border-style: none;
 }
 
 .modal-buttons {
@@ -483,7 +508,7 @@
   padding: 5px;
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: baseline;
   top: -10rem;
   right: 7rem;
   font-size: 18px;
@@ -541,6 +566,15 @@
   margin-bottom: 16px;
   position: relative;
   left: 9rem;
+  font-size: 4rem;
+  color: #007bff;
+}
+
+.modal-img{
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  position: relative;
   font-size: 4rem;
   color: #007bff;
   display: flex;

@@ -91,13 +91,13 @@ export const ModalEditarGeriatrico = ({ geriatrico, isOpen, onClose, onUpdate, u
                             />
                             {formData.ge_logo && <img src={formData.ge_logo} alt="Logo" className="geriatrico-logo" height={100} width={100}/>}
                         </div>
-                        <div className="color-boxes">
+                        <div className="color-options">
                             {[
                                 { key: "ge_color_principal", label: "Color Principal" },
                                 { key: "ge_color_secundario", label: "Color Secundario" },
                                 { key: "ge_color_terciario", label: "Color Terciario" }
                             ].map(({ key, label }) => (
-                                <div key={key} className="color-item">
+                                <div key={key} className="color-option">
                                     <label htmlFor={key} className="color-label">{label}</label>
                                     <input
                                         id={key}
@@ -106,6 +106,7 @@ export const ModalEditarGeriatrico = ({ geriatrico, isOpen, onClose, onUpdate, u
                                         value={formData[key]}
                                         onChange={handleChange}
                                         className="color-input"
+                                        style={{ backgroundColor: formData[key] }}
                                     />
                                 </div>
                             ))}

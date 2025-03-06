@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import "../../../css/sedes.css";
 import { useSede } from "../../../hooks/useSede";
 import { useSelector } from "react-redux";
@@ -9,7 +9,6 @@ export const SedeModal = ({ isOpen, onClose, onSave, sede }) => {
         se_telefono: "",
         se_direccion: "",
         cupos_totales: "",
-        cupos_ocupados: "",
         se_foto: null,
         rol_id: null, // Agregamos rol_id
         ge_id: null,  // Agregamos ge_id
@@ -17,7 +16,7 @@ export const SedeModal = ({ isOpen, onClose, onSave, sede }) => {
     const [previewImage, setPreviewImage] = useState(null);
     const [loading, setLoading] = useState(false);
     const { createSede, actualizarSede } = useSede();
-    
+
     // Obtenemos los datos desde Redux
     const rolSeleccionado = useSelector((state) => state.roles?.rolSeleccionado ?? null);
 
@@ -38,7 +37,6 @@ export const SedeModal = ({ isOpen, onClose, onSave, sede }) => {
                 se_telefono: sede.se_telefono || "",
                 se_direccion: sede.se_direccion || "",
                 cupos_totales: sede.cupos_totales || "",
-                cupos_ocupados: sede.cupos_ocupados || 0,
                 se_foto: null,
             }));
             setPreviewImage(sede.se_foto || null);
@@ -91,31 +89,47 @@ export const SedeModal = ({ isOpen, onClose, onSave, sede }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-                <h2 className="modal-title">{sede ? "Editar Sede" : "Agregar Nueva Sede"}</h2>
+            <div className="modal">
 
-                <form onSubmit={handleSubmit}>
-                    <input className="input" type="text" name="se_nombre" placeholder="Nombre de la sede" value={formData.se_nombre} onChange={handleChange} required />
+                <div className="modal-container" onClick={(e) => e.stopPropagation()}>
 
-                    <input className="input" type="text" name="se_telefono" placeholder="Teléfono" value={formData.se_telefono} onChange={handleChange} required />
+                    <form onSubmit={handleSubmit}>
+                        <div className="preview-image">
+                            {previewImage && <img src={previewImage} alt="Vista previa"  height={100} width={100} className="profile-img"/>}
+                        </div>
+                        <div className="modal-field">
+                            <label>Foto</label>
+                            <input className="input" type="file" accept="image/*" onChange={handleFileChange} required={!sede} />
+                        </div>
+                        <div className="modal-field">
+                            <label>Nombre</label>
+                            <input className="input" type="text" name="se_nombre" placeholder="Nombre de la sede" value={formData.se_nombre} onChange={handleChange} required />
+                        </div>
+                        <div className="modal-field">
+                            <label>Teléfono</label>
+                            <input className="input" type="text" name="se_telefono" placeholder="Teléfono" value={formData.se_telefono} onChange={handleChange} required />
+                        </div>
+                        <div className="modal-field">
+                            <label>Dirección</label>
+                            <input className="input" type="text" name="se_direccion" placeholder="Dirección" value={formData.se_direccion} onChange={handleChange} required />
+                        </div>
+                        <div className="modal-field">
+                            <label>Cupos Totales</label>
+                            <input className="input" type="number" name="cupos_totales" placeholder="Cupos Totales" value={formData.cupos_totales} onChange={handleChange} required />
+                        </div>
+                        {/* <div className="modal-field">
+                            <label>Cupos Ocupados</label>
+                            <input className="input" type="number" name="cupos_ocupados" placeholder="Cupos Ocupados" value={formData.cupos_ocupados} onChange={handleChange} required />
+                        </div> */}
 
-                    <input className="input" type="text" name="se_direccion" placeholder="Dirección" value={formData.se_direccion} onChange={handleChange} required />
-
-                    <input className="input" type="number" name="cupos_totales" placeholder="Cupos Totales" value={formData.cupos_totales} onChange={handleChange} required />
-
-                    <input className="input" type="number" name="cupos_ocupados" placeholder="Cupos Ocupados" value={formData.cupos_ocupados} onChange={handleChange} required />
-
-                    <input className="input" type="file" accept="image/*" onChange={handleFileChange} required={!sede} />
-
-                    {previewImage && <img src={previewImage} alt="Vista previa" className="preview-image" />}
-
-                    <div className="modal-buttons">
-                        <button type="button" onClick={onClose} className="cancel-btn" disabled={loading}>Cancelar</button>
-                        <button type="submit" className="save-btn" disabled={loading}>
-                            {loading ? "Guardando..." : sede ? "Actualizar" : "Guardar"}
-                        </button>
-                    </div>
-                </form>
+                        <div className="modal-buttons">
+                            <button type="submit" className="create" disabled={loading}>
+                                {loading ? "Guardando..." : sede ? "Actualizar" : "Guardar"}
+                            </button>
+                            <button type="button" onClick={onClose} className="cancel" disabled={loading}>Cancelar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

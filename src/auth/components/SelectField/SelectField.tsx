@@ -30,7 +30,8 @@ export const SelectField = (props: SelectFieldProps) => {
                         .filter((rol: any) => {
                             if (personaId === 1) return rol.rol_id === 2;
                             if (personaId === 2) return rol.rol_id === 3;
-                            if (personaId === 3) return [4, 5, 6, 7].includes(rol.rol_id);
+                            if (personaId === 3) return [4,5,6,7].includes(rol.rol_id);
+
                             return true;
                         })
                         .map((rol: any) => ({

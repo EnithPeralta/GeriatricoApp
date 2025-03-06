@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { usePersona } from "../../hooks/usePersona";
 import '../../css/asignar.css';
 import { GoBackButton } from "../components/GoBackButton";
-import { SelectGeriatrico } from "../../auth/components/SelectGeriatrico/SelectGeriatrico";
-import { SelectField } from '../../auth/components/SelectField/SelectField';
 import { useGeriatricoPersonaRol } from "../../hooks/useGeriatricoPersonaRol";
 import Swal from "sweetalert2";
+import { ModalEditPerson } from "../components/ModalEditPerson";
+import { PersonListGestionar } from "../components/Gestionar/PersonListGestionar";
+import { AssignCardGestionar } from "../components/Gestionar/AssignCardGestionar";
 
 export const GestionarPersonas = () => {
     const { obtenerPersonasRegistradas, obtenerPersonaRoles, updatePerson } = usePersona();
@@ -40,6 +41,7 @@ export const GestionarPersonas = () => {
             setLoading(true);
             try {
                 const response = await obtenerPersonasRegistradas();
+                console.log(response);
                 if (response.success) {
                     setPersonas(response.personas);
                 } else {
@@ -163,25 +165,6 @@ export const GestionarPersonas = () => {
         setShowEditModal(true);
     };
 
-    const handleEditChange = (e) => {
-        const { name, value } = e.target;
-        setEditedPersona(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setEditedPersona(prev => ({ ...prev, per_foto: reader.result }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
     const handleEditSubmit = async (e) => {
         e.preventDefault();
 
@@ -233,7 +216,6 @@ export const GestionarPersonas = () => {
         }
     };
 
-
     return (
         <div className="bodyAsignar">
             <GoBackButton />
@@ -258,150 +240,40 @@ export const GestionarPersonas = () => {
                             <p>Cargando personas...</p>
                         ) : error ? (
                             <p className="error">{error}</p>
-                        ) : filteredPersona ? (
+
+                        ) : (
                             <div>
-                                <div key={filteredPersona.id}
-                                    className={`sede-card-asignar ${activeCard === filteredPersona.id ? "active" : ""}`}
-                                    onClick={() => handleCardClick(filteredPersona)}>
-                                    {filteredPersona.foto ? (
-                                        <img src={filteredPersona.foto} alt="Foto de perfil" className="asignar-img" />
-                                    ) : (
-                                        <i className="fas fa-user-circle "></i>
-                                    )}
-                                    <div className="sede-info">
-                                        <div className="full-name">{filteredPersona.nombre}</div>
-                                        <div className="CC">{filteredPersona.telefono}</div>
-                                    </div>
-                                    <button
-                                        className="edit-button-asignar"
-                                        onClick={() => openEditModal(filteredPersona)}
-                                    >
-                                        <i className="fa-solid fa-user-pen i-asignar" />
-                                    </button>
-
-                                    <button
-                                        className="add-button-asignar"
-                                        onClick={(e) => {
-                                            e.stopPropagation(); // Evita que el evento afecte a otros elementos
-                                            openAssignCard(filteredPersona);
-                                        }}
-                                    >
-                                        <i className="fas fa-arrow-up i-asignar" />
-                                    </button>
-                                </div>
-
-                                {Number(activeCard) === Number(filteredPersona.id) && (
-                                    <div className="sede-card-asignar">
-                                        {roles.rolesGeriatrico.length > 0 || roles.rolesSede.length > 0 ? (
-                                            <>
-                                                {roles.rolesGeriatrico.map((rol, index) => (
-                                                    <div key={index}>
-                                                        <div className="full-name">{rol.rol_nombre}</div>
-                                                        <div className="CC">{rol.geriatrico?.ge_nit}</div>
-                                                        <div className="CC">{rol.geriatrico?.ge_nombre}</div>
-                                                        <div className="CC">{rol.fechaInicio} - {rol.fechaFin}</div>
-                                                    </div>
-                                                ))}
-                                                {roles.rolesSede.map((rol, index) => (
-                                                    <div key={index}>
-                                                        <div className="full-name">{rol.nombre}</div>
-                                                        <div className="CC">{rol.sede?.geriatrico?.nitGeriatrico}</div>
-                                                        <div className="CC">{rol.sede?.nombre}</div>
-                                                    </div>
-                                                ))}
-                                            </>
-                                        ) : (
-                                            <p>No hay roles asignados.</p>
-                                        )}
-                                    </div>
-                                )}
-
-
+                                <PersonListGestionar
+                                    personasFiltradas={[filteredPersona]}
+                                    activeCard={activeCard}
+                                    handleCardClick={handleCardClick}
+                                    openEditModal={openEditModal}
+                                    openAssignCard={openAssignCard}
+                                    roles={roles}
+                                />
                                 {showAssignCard && selectedPersona?.id === filteredPersona.id && (
-                                    <div className="sede-card-asignar">
-                                        <SelectGeriatrico name="ge_id" value={selectedGeriatrico} onChange={(e) => setSelectedGeriatrico(Number(e.target.value))} />
-                                        <SelectField name="rol_id" value={selectedRoles} onChange={(roles) => setSelectedRoles(roles.map(Number))} />
-                                        <div className="form-group-asignar">
-                                            <label className="date-label">Fecha Inicial:</label>
-                                            <input
-                                                type="date"
-                                                value={fechaInicio}
-                                                className="date-input"
-                                                onChange={(e) => setFechaInicio(e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="form-group-asignar">
-                                            <label className="date-label">Fecha Final (opcional):</label>
-                                            <input
-                                                type="date"
-                                                className="date-input"
-                                                value={fechaFin}
-                                                onChange={(e) => setFechaFin(e.target.value)}
-                                            />
-                                        </div>
-
-                                        <button className="asignar-button" onClick={handleAssignRole} disabled={assigning}>{assigning ? "Asignando..." : "Asignar"}</button>
-                                    </div>
+                                    <AssignCardGestionar
+                                        selectedGeriatrico={selectedGeriatrico}
+                                        setSelectedGeriatrico={setSelectedGeriatrico}
+                                        selectedRoles={selectedRoles}
+                                        setSelectedRoles={setSelectedRoles}
+                                        fechaInicio={fechaInicio}
+                                        setFechaInicio={setFechaInicio}
+                                        fechaFin={fechaFin}
+                                        setFechaFin={setFechaFin}
+                                        assigning={assigning}
+                                        handleAssignRole={handleAssignRole}
+                                    />
                                 )}
                             </div>
-                        ) : null}
+                        )}
 
                         {showEditModal && editedPersona && (
-                            <div className="modal-overlay">
-                                <div className="modal">
-                                    <div className="modal-content">
-                                        <form onSubmit={handleEditSubmit}>
-                                            <div className="asignar-img-edit">
-                                                {editedPersona.foto ? (
-                                                    <img src={editedPersona.foto} alt="Foto de perfil" height={100} width={100} />
-                                                ) : (
-                                                    <i className="fas fa-user-circle icon-edit"></i>
-                                                )}
-                                            </div>
-                                            <div className="modal-field">
-                                                <label>Cambiar foto:</label>
-                                                <input type="file" name="foto" accept="image/*" onChange={handleFileChange} />
-                                            </div>
-
-                                            <div className="modal-field">
-                                                <label >Usuario:</label>
-                                                <input type="text" name="usuario" value={editedPersona.usuario} onChange={handleEditChange} required />
-                                            </div>
-
-                                            <div className="modal-field">
-                                                <label >Nombre Completo:</label>
-                                                <input type="text" name="nombre" value={editedPersona.nombre} onChange={handleEditChange} required />
-                                            </div>
-
-                                            <div className="modal-field">
-                                                <label >Correo:</label>
-                                                <input type="email" name="correo" value={editedPersona.correo} onChange={handleEditChange} required />
-                                            </div>
-
-                                            <div className="modal-field">
-                                                <label >Teléfono:</label>
-                                                <input type="text" name="telefono" value={editedPersona.telefono} onChange={handleEditChange} required />
-                                            </div>
-
-                                            <div className="modal-field">
-                                                <label >Género:</label>
-                                                <input type="text" name="genero" value={editedPersona.genero} onChange={handleEditChange} required />
-                                            </div>
-
-                                            <div className="modal-field">
-                                                <label >Contraseña:</label>
-                                                <input type="password" name="password" value={editedPersona.password} onChange={handleEditChange} required />
-                                            </div>
-
-                                            <div className="modal-buttons">
-                                                <button type="submit" className="create">Guardar</button>
-                                                <button type="button" className="cancel" onClick={() => setShowEditModal(false)}>Cancelar</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-
-                            </div>
+                            <ModalEditPerson
+                                editedPersona={editedPersona}
+                                onSubmit={handleEditSubmit}
+                                onClose={() => setShowEditModal(false)}
+                            />
                         )}
                     </div>
                 </div>

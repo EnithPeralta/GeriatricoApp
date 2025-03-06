@@ -1,5 +1,5 @@
 .bodySedes {
-    background: linear-gradient(120deg, #bbbbbb 25%, #e9e9e9 50%);
+    /* background: linear-gradient(120deg, #bbbbbb 25%, #e9e9e9 50%); */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -14,7 +14,7 @@
     position: absolute;
     width: 600px;
     height: 600px;
-    background-color: #33B0D7;
+    /* background-color: #33B0D7; */
     border-radius: 50%;
     box-shadow: -30px -15px 30px 5px #ffffff86,
     30px 15px 40px 15px#0000003d,
@@ -128,6 +128,8 @@
     transition: transform 0.2s;
     margin-left: 20px;
     margin-right: 20px;
+    height: 100px;
+    cursor: pointer;
 }
 
 .sede-card:hover {

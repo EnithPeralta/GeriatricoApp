@@ -93,7 +93,7 @@
     align-items: center;
     margin-bottom: 16px;
     cursor: pointer;
-    gap: 10px;
+    gap: 1rem;
 }
 
 .container-cards{
@@ -155,8 +155,8 @@
 
 .add-button-asignar,
 .edit-button-asignar,
-.active-button-asignar,
-.inactive-button-asignar,
+.active,
+.inactive,
 .inactive-button-fa
  {
     color: white;
@@ -171,20 +171,20 @@
     font-size: 18px;
     gap: 15px;
 }
+
 .inactive-button-fa{
     background-color:#df0016 ;
 }
 
-
-.active-button-asignar {
-    background-color: #07db00;
+.active {
+    background-color: #0caf07;
 }
 
-.active-button-asignar:hover {
+.active:hover {
     background-color: #087005;
 }
 
-.inactive-button-asignar{
+.inactive{
     background-color: #df0016;
 }
 .edit-button-asignar {
@@ -196,10 +196,10 @@
 }
 
 .edit-button-asignar:hover {
-    background-color: #0d470a;
+    background-color: #fd8904;
 }
 
-.inactive-button-asignar:hover, .inactive-button-fa:hover{
+.inactive:hover, .inactive-button-fa:hover{
     background-color: #af1625;
 }
 
@@ -241,7 +241,7 @@ background-color: #ddd;
 }
 
 .date-input{
-    width: 50%;
+    width: 100%;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -274,23 +274,22 @@ display: block; /* Mostrar contenido del dropdown al pasar el mouse */
     object-fit: cover;
     margin-right: 20px;
     position: relative;
-    left: 50%;
+    display: flex;
+    justify-content: center;
 }
 
 .icon-edit{
     font-size: 4rem;
     border-radius: 50%;
-    position: relative;
-    display: flex;
+    position: static;
 }
 
 .status-icon-active{
-    position: relative;
+    position:absolute;
     display: flex;
     justify-content: center;
-    left: -46rem ;
-    top: -3rem;
     padding: 0px;
+    object-fit: cover;
 }
 
 .status-icon-active .activo{
@@ -354,9 +353,6 @@ input[type="checkbox"]{
     display: flex;  
 }
 
-.form-group-asignar{
-    
-}
 .date-label{
     font-size: 15px;
 }

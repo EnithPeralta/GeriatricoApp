@@ -97,27 +97,6 @@ export const ModalCrearGeriatrico = ({ isOpen, onClose, onSave }) => {
                 </div>
             </div>
             <div >
-                {/* <form  className="geriatrico-form">
-                    <input type="text" className="geriatrico-input" name="ge_nombre" placeholder="Nombre" value={formData.ge_nombre} onChange={handleChange} required />
-                    <input type="text" className="geriatrico-input" name="ge_nit" placeholder="NIT" value={formData.ge_nit} onChange={handleChange} required />
-                    <div className="color-boxes">
-                        <input type="color" className="box-input" name="ge_color_principal" value={formData.ge_color_principal} onChange={handleChange} required />
-                        <input type="color" className="box-input" name="ge_color_secundario" value={formData.ge_color_secundario} onChange={handleChange} required />
-                        <input type="color" className="box-input" name="ge_color_terciario" value={formData.ge_color_terciario} onChange={handleChange} required />
-                    </div>
-                    <input type="file" className="modal-logo" name="ge_logo" accept="image/*" onChange={handleFileChange} required />
-
-                    {error && <p className="error-message">{error}</p>}
-                    {success && <p className="success-message">{success}</p>}
-                    <div className="buttons">
-                        <button type="submit" disabled={loading}>
-                            {loading ? "Guardando..." : "Crear"}
-                        </button>
-                        <button type="button" onClick={onClose} className="cancel-button">
-                            Cancelar
-                        </button>
-                    </div>
-                </form> */}
             </div>
         </div>
     );

@@ -53,7 +53,7 @@ export const AdminSuper = () => {
                     <div className="building-content">
                         <h2 className="building-title">Dedicamos cada día a brindar cuidado, protección y amor.</h2>
                         <div className="buttons-group">
-                            <button className="button button-outline" onClick={() => navigate("/geriatrico/geriatricoActive")}>
+                            <button className="button button-outline" onClick={() => navigate("/geriatrico/geriatrico")}>
                                 <i className="fa-solid fa-plus"></i> Crear Geriátrico
                             </button>
                             <button className="button button-filled" onClick={() => navigate("/geriatrico/roles")}>

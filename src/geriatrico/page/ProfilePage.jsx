@@ -20,9 +20,11 @@ export const ProfilePage = () => {
     const fetchPersona = async () => {
       try {
         const result = await getAuthenticatedPersona();
+        console.log(result);
         if (isMounted) {
           setPersona(result.success ? result.persona : null);
         }
+        console.log(result.persona);
       } catch (error) {
         console.error("Error en la solicitud:", error.message);
       } finally {
@@ -40,8 +42,10 @@ export const ProfilePage = () => {
   }, []); // 🔹 Se ej
 
   const handleEdit = () => {
+    setEditedPersona(persona); 
     setShowModal(true);
   };
+  
 
   if (loading) {
     return <CargandoComponent />;
@@ -59,9 +63,9 @@ export const ProfilePage = () => {
         <h2 className="h2">Perfil</h2>
         <div className="profile-card">
           <div className="info">
-            <div className="profile-picture">
+            <div className="">
               {persona.foto ? (
-                <img src={persona.foto} alt="Foto de perfil" className="profile-img" />
+                <img src={persona.foto} alt="Foto de perfil" className="profile-img"  height={100} width={100}/>
               ) : (
                 <i className="fas fa-user-circle"></i>
               )}

@@ -1,17 +1,29 @@
-import { useState } from "react";
 import geriatricoApi from "../api/geriatricoApi";
 import { getToken } from "../helpers/getToken";
 import { setRolError, setRolSeleccionado, startSeleccion } from "../store/geriatrico/rolSlice";
 import { useDispatch } from "react-redux";
-import { setGeriatricoSeleccionado } from "../store/geriatrico/geriatricoSlice";
 import { store } from "../store/store";
 
 export const useRoles = () => {
     const dispatch = useDispatch();
 
     const crearRol = async ({ rol_nombre, rol_descripcion }) => {
+        const token = getToken();
+        if (!token) {
+            const errorMessage = "No hay token disponible";
+            console.error(errorMessage);
+            dispatch(setSedeError(errorMessage));
+            return { success: false, message: errorMessage, rol: null };
+        }
         try {
-            const { data } = await geriatricoApi.post('/roles', { rol_nombre, rol_descripcion });
+            const { data } = await geriatricoApi.post('/roles',
+                { rol_nombre, rol_descripcion }
+                , {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                }
+            );
 
             if (data && data.rol) {
                 return {
@@ -33,8 +45,21 @@ export const useRoles = () => {
     };
 
     const obtenerRoles = async () => {
+        const token = getToken();
+        if (!token) {
+            const errorMessage = "No hay token disponible";
+            console.error(errorMessage);
+            dispatch(setSedeError(errorMessage));
+            return { success: false, message: errorMessage, rol: null };
+        }
         try {
-            const { data } = await geriatricoApi.get('/roles');
+            const { data } = await geriatricoApi.get('/roles',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                }
+            );
 
             if (data && data.roles) {
                 return {
@@ -56,9 +81,22 @@ export const useRoles = () => {
     };
 
     const actualizarRol = async ({ rol_id, rol_nombre, rol_descripcion }) => {
+        const token = getToken();
+        if (!token) {
+            const errorMessage = "No hay token disponible";
+            console.error(errorMessage);
+            dispatch(setSedeError(errorMessage));
+            return { success: false, message: errorMessage, rol: null };
+        }
         try {
             // Hacer la solicitud PUT con los datos a actualizar
-            const { data } = await geriatricoApi.put(`/roles/${rol_id}`, { rol_nombre, rol_descripcion });
+            const { data } = await geriatricoApi.put(`/roles/${rol_id}`, { rol_nombre, rol_descripcion },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                }
+            );
 
             // Validar la respuesta
             if (data?.rol) {
@@ -81,8 +119,21 @@ export const useRoles = () => {
     };
 
     const obtenerRolesAsignados = async () => {
+        const token = getToken();
+        if (!token) {
+            const errorMessage = "No hay token disponible";
+            console.error(errorMessage);
+            dispatch(setSedeError(errorMessage));
+            return { success: false, message: errorMessage, rol: null };
+        }
         try {
-            const { data } = await geriatricoApi.get('/roles/rolesAsignados');
+            const { data } = await geriatricoApi.get('/roles/rolesAsignados',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                }
+            );
             // Extraemos los roles de ambas categorías
             const rolesGeriatrico = data?.opcionesGeriatrico?.map(rol => ({
                 rol_id: rol.rol_id,
@@ -199,11 +250,53 @@ export const useRoles = () => {
         }
     };
 
+    const obtenerHistorialRoles = async ({ ge_id }) => {
+        const token = getToken();
+    
+        if (!token) {
+            const errorMessage = "No hay token disponible";
+            console.error(errorMessage);
+            dispatch(setSedeError(errorMessage));
+            return { success: false, message: errorMessage, data: [] };
+        }
+    
+        try {
+            const { data } = await geriatricoApi.get(`/roles/historialGeriatrico/${ge_id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            if (data.data && data.data.length > 0) {
+                return {
+                    success: true,
+                    message: data.message || "Historial de roles obtenido exitosamente",
+                    data: data.data, // Retorna la estructura completa del backend
+                };
+            } else {
+                return {
+                    success: false,
+                    message: data.message || "No hay historial de roles.",
+                    data: [],
+                };
+            }
+        } catch (error) {
+            console.error("Error al obtener el historial de roles:", error);
+            return {
+                success: false,
+                message: error.response?.data?.message || "Error al obtener el historial de roles",
+                data: [],
+            };
+        }
+    };
+    
+
     return {
         crearRol,
         obtenerRoles,
         actualizarRol,
         obtenerRolesAsignados,
-        seleccionarRol
+        seleccionarRol,
+        obtenerHistorialRoles
     };
 }

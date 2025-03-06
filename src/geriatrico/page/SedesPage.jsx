@@ -12,7 +12,7 @@ import { useGeriatrico } from "../../hooks/useGeriatrico";
 import { CargandoComponent } from "../components";
 
 export const SedesPage = () => {
-    const { obtenerSedesGeriatrico, inactivarSedes, obtenerDetalleSede } = useSede();
+    const { obtenerSedesGeriatrico, inactivarSedes, obtenerDetalleSede, reactivarSedes } = useSede();
     const { homeMiGeriatrico } = useGeriatrico();
     const { startLogout } = useAuthStore();
     const [sedes, setSedes] = useState([]);
@@ -23,6 +23,7 @@ export const SedesPage = () => {
     const [sedeToEdit, setSedeToEdit] = useState(null);
     const [selectedSede, setSelectedSede] = useState(null);
     const [geriatrico, setGeriatrico] = useState(null);
+    const [sedesInactive, setSedesInactive] = useState([]);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const rolSeleccionado = useSelector(state => state.roles?.rolSeleccionado ?? null);
@@ -117,6 +118,30 @@ export const SedesPage = () => {
         }
     };
 
+    const handleReactivarSedes = async (se_id) => {
+        const confirm = await Swal.fire({
+            text: "¿Estás seguro de que deseas reactivar este sedes?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, reactivar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (confirm.isConfirmed) {
+            const result = await reactivarSedes(se_id);
+
+            if (result.success) {
+                Swal.fire({
+                    icon: "success",
+                    text: "La sede ha sido reactivado correctamente."
+                });
+                setSedesInactive((prev) => prev.filter(s => s.se_id !== se_id));
+            } else {
+                Swal.fire(result.message, "error");
+            }
+        }
+    };
+
     const filteredSedes = sedes.filter(sede =>
         sede.se_nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         sede.se_direccion.toLowerCase().includes(searchTerm.toLowerCase())
@@ -150,11 +175,7 @@ export const SedesPage = () => {
                     </div>
                     <div className="icon" onClick={() => navigate("/geriatrico/sedes")}>
                         <i className="fa-solid fa-building" />
-                        <span className="icon-text">Sedes Activas</span>
-                    </div>
-                    <div className="icon" onClick={() => navigate("/geriatrico/sedesInactivos")}>
-                        <i className="fa-solid fa-building" />
-                        <span className="icon-text">Sedes Inactivos</span>
+                        <span className="icon-text">Sedes</span>
                     </div>
                     <div className="icon" onClick={() => navigate("/register")}>
                         <i className="fa-solid fa-user-plus" />
@@ -180,14 +201,15 @@ export const SedesPage = () => {
                     placeholder="Buscar por nombre o dirección..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input" />
+                    className="search-input"
+                />
                 <div className="grid">
                     {filteredSedes.length > 0 ? (
                         filteredSedes.map((sede) => (
-                            <div key={sede.se_id} className={`card-item ${sede.se_activo ? 'active' : 'inactive'}`}>
+                            <div key={sede.se_id}>
                                 <div className="grid-item">
                                     {sede.se_foto ? (
-                                        <img className="" src={sede.se_foto} alt={`${sede.se_nombre}`} width="100" height="100" />
+                                        <img src={sede.se_foto} alt={`${sede.se_nombre}`} width="100" height="100" />
                                     ) : (
                                         <i className="fa-solid fa-hospital" />
                                     )}
@@ -206,7 +228,13 @@ export const SedesPage = () => {
                                     <div className="actions">
                                         <button
                                             className={`toggle-button ${sede.se_activo ? 'active' : 'inactive'}`}
-                                            onClick={() => handleInactivarSedes(sede.se_id)}
+                                            onClick={() => {
+                                                if (sede.se_activo) {
+                                                    handleInactivarSedes(sede.se_id);
+                                                } else {
+                                                    handleReactivarSedes(sede.se_id);
+                                                }
+                                            }}
                                         >
                                             <i className={`fas ${sede.se_activo ? 'fa-toggle-on' : 'fa-toggle-off'}`} />
                                         </button>

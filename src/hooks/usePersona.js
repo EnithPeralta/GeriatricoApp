@@ -116,14 +116,14 @@ export const usePersona = () => {
     // Funcion para buscar si una persona ya esta vinculada a un geriatrico
     const buscarVincularPersona = async ({ documento, ge_id }) => {
         const token = getToken();
-
+    
         if (!token) {
             return {
                 success: false,
                 message: "Token de autenticación no encontrado.",
             };
         }
-
+    
         try {
             const { data } = await geriatricoApi.get(
                 `/personas/buscar/${documento}`,
@@ -133,7 +133,7 @@ export const usePersona = () => {
                     },
                 }
             );
-
+            console.log(data);
             if (!data) {
                 return {
                     success: false,
@@ -141,26 +141,15 @@ export const usePersona = () => {
                     action: "register",
                 };
             }
-
-            const { per_id, per_nombre, per_documento, geriatricos } = data;
-
-            // Verificar si ya está vinculada al geriátrico actual
-            const vinculoExistente = geriatricos.some((g) => g.ge_id === ge_id);
-
-            if (vinculoExistente) {
-                return {
-                    success: false,
-                    message: "La persona ya está vinculada a este geriátrico.",
-                    action: "none",
-                };
-            }
-
+    
+            const { per_id, per_nombre_completo, per_documento, geriatricos } = data;
+    
             return {
                 success: true,
-                message: "Persona encontrada. ¿Desea vincularla?",
-                action: "link",
+                message: "Persona encontrada. ¿Desea asignarle un rol?",
+                action: "assign_role",
                 per_id,
-                per_nombre,
+                per_nombre: per_nombre_completo,
                 per_documento,
                 geriatricos, // Lista de geriátricos a los que ya pertenece
             };

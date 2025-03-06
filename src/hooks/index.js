@@ -5,3 +5,4 @@ export * from './useEnfermera';
 export * from './usePersona';
 export * from './useSession';
 export * from './useSedesRol';
+export * from './usePaciente';

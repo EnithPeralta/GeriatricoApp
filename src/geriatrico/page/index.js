@@ -7,5 +7,6 @@ export * from './ProfilePage';
 export * from './GeriatricoPage';
 export * from './RolesPage';
 export * from './GestionarPersonas';
-export * from './SedesInactivoPage';
 export * from './GestionPersonaGeriatricoPage';
+export * from './HistorialRoles';
+export * from './EnfermerasPage';
