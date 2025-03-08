@@ -2,11 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuthStore, useEnfermera, useForm, usePaciente, usePersona, useSession } from '../../hooks';
 import Swal from 'sweetalert2';
 import { InputField } from './InputField/InputField';
-import { useSedesRol } from '../../hooks';
 import { ModalRegistrarPaciente } from '../../geriatrico/components/ModalRegistrarPaciente ';
-import { AssignCard } from '../../geriatrico/components/AssignCard';
 import { ModalEnfermera } from '../../geriatrico/components/ModalEnfermera';
 import { SelectField } from './SelectField/SelectField';
+import { FieldSelect } from './FieldSelect/FieldSelect';
 
 const registerFormFields = {
     per_password: '',
@@ -24,19 +23,14 @@ export const RegisterForm = () => {
     const { startRegister, errorMessage } = useAuthStore();
     const { registrarPaciente } = usePaciente();
     const { obtenerSesion } = useSession();
-    const {startRegisterEnfermera } = useEnfermera();
-    const { asignarRolAdminSede, inactivarRolAdminSede, asignarRolesSede } = useSedesRol();
+    const { startRegisterEnfermera } = useEnfermera();
     const [esSuperAdmin, setEsSuperAdmin] = useState(false);
     const [loading, setLoading] = useState(false);
     const { buscarVincularPersona } = usePersona()
     const [adminGeriátrico, setAdminGeriátrico] = useState(null);
-    const [showAssignCard, setShowAssignCard] = useState(false);
     const [selectedPersona, setSelectedPersona] = useState(null);
     const [selectedRoles, setSelectedRoles] = useState([]);
-    const [fechaInicio, setFechaInicio] = useState("");
-    const [fechaFin, setFechaFin] = useState("");
-    const [selectedSedes, setSelectedSedes] = useState("");
-    const [assigning, setAssigning] = useState(false);
+    const [showExtraFields, setShowExtraFields] = useState("");
     const fetchedRef = useRef(false);
     const [showModal, setShowModal] = useState(false);
     const [showSelectRoles, setShowSelectRoles] = useState(false);
@@ -69,6 +63,18 @@ export const RegisterForm = () => {
         per_foto,
         onInputChange,
         isPasswordVisible,
+        rol_id,
+        pac_edad,
+        pac_peso,
+        pac_talla,
+        pac_regimen_eps,
+        pac_nombre_eps,
+        pac_rh_grupo_sanguineo,
+        pac_talla_camisa,
+        pac_talla_pantalon,
+        enf_codigo,
+        sp_fecha_inicio,
+        sp_fecha_fin,
         togglePasswordVisibility
     } = useForm(registerFormFields);
 
@@ -83,26 +89,26 @@ export const RegisterForm = () => {
 
     const buscarPersona = async () => {
         if (!per_documento.trim()) return;
-    
+
         setLoading(true);
         try {
             const sesion = await obtenerSesion();
             const ge_id = sesion?.ge_id;
-    
+
             const resultado = await buscarVincularPersona({ documento: per_documento, ge_id });
             console.log(resultado); // Para depuración
-    
+
             if (resultado.success) {
                 setSelectedPersona(resultado);
-    
+
                 Swal.fire({
                     icon: 'question',
                     text: resultado.message,
                     confirmButtonText: 'Aceptar',
                 });
-    
+
                 // Esperamos a que el usuario seleccione un rol antes de mostrar el modal correcto
-                setShowSelectRoles(true); 
+                setShowSelectRoles(true);
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -119,183 +125,89 @@ export const RegisterForm = () => {
             setLoading(false);
         }
     };
-      
 
-    // const handleAssignRole = async () => {
-    //     if (!selectedPersona || selectedSedes.length === 0 || selectedRoles.length === 0 || !fechaInicio) {
-    //         console.log("Validación fallida: ", selectedRoles, selectedSedes, selectedPersona, fechaInicio, fechaFin);
-    //         Swal.fire({
-    //             icon: "error",
-    //             text: "Debe seleccionar al menos una sede y un rol, y definir la fecha de inicio.",
-    //         });
-    //         return;
-    //     }
-    //     setAssigning(true);
-    //     try {
-    //         for (let rol_id of selectedRoles) {
-    //             const response = await asignarRolAdminSede({
-    //                 per_id: selectedPersona.per_id,
-    //                 se_id: Number(selectedSedes),
-    //                 rol_id: rol_id,
-    //                 sp_fecha_inicio: fechaInicio,
-    //                 sp_fecha_fin: fechaFin || null,
-    //             });
-    //             console.log("Respuesta del servidor:", response);
-    //             if (!response.success) {
-    //                 throw new Error(response.message);
-    //             }
-    //         }
-    //         Swal.fire({
-    //             icon: "success",
-    //             text: "Rol asignado exitosamente",
-    //         });
-    //         resetForm();
-    //     } catch (error) {
-    //         console.error("Error al asignar rol:", error);
-    //         Swal.fire({
-    //             icon: "error",
-    //             text: error.message || "Error al asignar rol",
-    //         });
-    //     } finally {
-    //         setAssigning(false);
-    //     }
-    // };
-    // const handleAssignSedes = async () => {
-    //     try {
-    //         // Validar que los valores requeridos estén presentes
-    //         if (!selectedPersona?.per_id || !selectedRoles || !fechaInicio) {
-    //             console.warn("❌ Datos incompletos para la asignación del rol.");
-    //             await Swal.fire({
-    //                 icon: "warning",
-    //                 text: "Por favor, complete todos los campos obligatorios antes de asignar el rol."
-    //             });
-    //             return;
-    //         }
 
-    //         // Enviar solicitud para asignar rol
-    //         const response = await asignarRolesSede({
-    //             per_id: selectedPersona.per_id,
-    //             rol_id: selectedRoles,
-    //             sp_fecha_inicio: fechaInicio,
-    //             sp_fecha_fin: fechaFin || null,
-    //         });
+    useEffect(() => {
+        // showExtraFields se activa si el usuario elige el rol 3 (Admin Sede)
+        setShowExtraFields(rol_id === 3 && !esSuperAdmin && !adminGeriátrico);
+    }, [rol_id, esSuperAdmin, adminGeriátrico]);
 
-    //         // Manejo de la respuesta del servidor
-    //         if (response?.success) {
-    //             console.log("✅ Rol asignado con éxito:", response.message);
-    //             await Swal.fire({
-    //                 icon: "success",
-    //                 text: response.message
-    //             });
+    const handleRoleChange = (event) => {
+        const value = Number(event.target.value); // Asegurar que sea un número
+        setSelectedRoles(value);
+        setShowExtraFields(value === 4); // Compara estrictamente con ===
+        setShowModalEnfermera(value === 5);
+    };
 
-    //             // Si el rol asignado es "Paciente", mostrar mensaje adicional y abrir modal
-    //             if (response.rolNombre === "Paciente" && response.mensajeAdicional) {
-    //                 await Swal.fire({
-    //                     icon: "info",
-    //                     text: response.mensajeAdicional,
-    //                 });
-    //                 setShowModal(true);
-    //             }
-    //         } else {
-    //             console.warn("⚠️ Error en la asignación del rol:", response?.message || "Error desconocido.");
-    //             await Swal.fire({
-    //                 icon: "error",
-    //                 text: response?.message || "Hubo un problema al asignar el rol."
-    //             });
-    //         }
-    //     } catch (error) {
-    //         console.error("❌ Error inesperado al asignar el rol:", error);
-    //         await Swal.fire({
-    //             icon: "error",
-    //             text: error?.message || "Ocurrió un error inesperado. Inténtelo nuevamente."
-    //         });
-    //     }
-    // };
-    // const handlePaciente = async (datosPaciente) => {
-    //     if (!datosPaciente || !datosPaciente.per_id) {
-    //         Swal.fire({
-    //             icon: 'warning',
-    //             text: "⚠️ No se ha seleccionado una persona válida.",
-    //         });
-    //         return;
-    //     }
 
-    //     console.log("📤 Enviando datos del paciente:", datosPaciente);
 
-    //     try {
-    //         const response = await registrarPaciente(datosPaciente);
+    const handlePacientes = async (datosPaciente) => {
+        if (!datosPaciente.per_id) {
+            Swal.fire({
+                icon: 'warning',
+                text: "⚠️ No se ha seleccionado una persona válida.",
+            });
+            return;
+        }
 
-    //         if (response.success) {
-    //             Swal.fire({
-    //                 icon: 'success',
-    //                 text: response.message,
-    //             });
-    //             setShowModal(false);
-    //         } else {
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 text: response.message,
-    //             });
-    //         }
-    //     } catch (error) {
-    //         console.error("❌ Error al registrar paciente:", error);
+        console.log("📤 Enviando datos del paciente:", datosPaciente);
 
-    //         let errorMessage = "Ocurrió un error inesperado. Inténtalo nuevamente.";
-    //         if (error.response?.data?.message) {
-    //             errorMessage = error.response.data.message;
-    //         } else if (error.request) {
-    //             errorMessage = "No se pudo conectar con el servidor.";
-    //         }
+        try {
+            const response = await registrarPaciente(datosPaciente);
+            console.log("✅ Respuesta del backend en handlePacientes:", response);
 
-    //         Swal.fire({
-    //             icon: 'error',
-    //             text: errorMessage,
-    //         });
-    //     }
-    // };
+            Swal.fire({
+                icon: response?.success ? 'success' : 'error',
+                text: response?.message || "Error desconocido",
+            });
+
+        } catch (error) {
+            console.error("❌ Error al registrar paciente:", error);
+            Swal.fire({
+                icon: 'error',
+                text: error?.response?.data?.message || "Error al registrar paciente"
+            });
+        }
+    };
+
 
     const handleEnfermera = async (datosEnfermera) => {
-            if (!datosEnfermera.per_id) {
-                Swal.fire({
-                    icon: 'warning',
-                    text: "⚠️ No se ha seleccionado una persona válida.",
-                });
-                return;
+        if (!datosEnfermera.per_id) {
+            Swal.fire({
+                icon: 'warning',
+                text: "⚠️ No se ha seleccionado una persona válida.",
+            });
+            return;
+        }
+
+        console.log("📤 Enviando datos de la enfermera:", datosEnfermera)
+
+        try {
+            const response = await startRegisterEnfermera(datosEnfermera);
+            console.log(response);
+
+            Swal.fire({
+                icon: response.success ? 'success' : 'error',
+                text: response.message,
+            });
+
+            if (response.success) {
+                setShowModal(false); // Cierra el modal si el registro es exitoso
+            } else {
+                console.error("❌ Error al registrar enfermera:", response.message);
             }
-    
-            console.log("📤 Enviando datos de la enfermera:", datosEnfermera)
-    
-            try {
-                const response = await startRegisterEnfermera(datosEnfermera);
-                console.log(response);
-    
-                Swal.fire({
-                    icon: response.success ? 'success' : 'error',
-                    text: response.message,
-                });
-    
-                if (response.success) {
-                    setShowModal(false); // Cierra el modal si el registro es exitoso
-                } else {
-                    console.error("❌ Error al registrar enfermera:", response.message);
-                }
-            } catch (error) {
-                console.error("❌ Error al registrar enfermera:", error.response.data.message);
-                Swal.fire({
-                    icon: 'error',
-                    text: error.response.data.message
-                })
-            }
-        };
-    
-    const resetForm = () => {
-        setShowAssignCard(false);
-        setSelectedPersona(null);
-        setSelectedRoles([]);
-        setSelectedSedes("");
-        setFechaInicio("");
-        setFechaFin("");
+        } catch (error) {
+            console.error("❌ Error al registrar enfermera:", error.response.data.message);
+            Swal.fire({
+                icon: 'error',
+                text: error.response.data.message
+            })
+        }
     };
+
+    function validRegister() {
+        return per_password && confirm_password && per_usuario && per_genero && per_telefono && per_nombre_completo && per_documento && per_correo;
+    }
 
     const registroSubmit = async (e) => {
         e.preventDefault();
@@ -306,7 +218,7 @@ export const RegisterForm = () => {
         }
 
         try {
-            await startRegister({
+            const response = await startRegister({
                 per_correo,
                 per_usuario,
                 per_genero,
@@ -314,21 +226,80 @@ export const RegisterForm = () => {
                 per_nombre_completo,
                 per_password,
                 per_documento,
-                per_foto
+                per_foto,
+                rol_id: selectedRoles
             });
 
+            const idPersona = response?.data?.per_id;
+            if (!idPersona) {
+                Swal.fire({ icon: 'error', text: 'No se pudo obtener el ID de la persona' });
+                return;
+            }
+
+            // Convertir selectedRoles a número en caso de que sea string
+            const rolId = Number(selectedRoles);
+
+            if (rolId === 4) {  // Paciente
+                const datosPaciente = {
+                    per_id: idPersona,  // Se corrige el nombre del campo
+                    rol_id: rolId,      // Se incluye el rol_id
+                    pac_edad,
+                    pac_peso,
+                    pac_talla,
+                    pac_regimen_eps,
+                    pac_nombre_eps,
+                    pac_rh_grupo_sanguineo,
+                    pac_talla_camisa,
+                    pac_talla_pantalon,
+                    sp_fecha_inicio,
+                    sp_fecha_fin
+                };
+
+                console.log("📤 Enviando datos del paciente:", datosPaciente);
+                await handlePacientes(datosPaciente);
+                Swal.fire({
+                    icon: 'success',
+                    text: response?.message
+                })
+                console.log("Datos paciente registrados:", datosPaciente);
+            } else if (rolId === 5) {
+                const datosEnfermera = {
+                    per_id: idPersona,
+                    rol_id: rolId,
+                    enf_codigo,
+                    sp_fecha_inicio,
+                    sp_fecha_fin
+                }
+
+                console.log("📤 Enviando datos de la enfermera:", datosEnfermera);
+                await handleEnfermera(datosEnfermera);
+                Swal.fire({
+                    icon: 'success',
+                    text: response?.message
+                })
+                console.log("Datos enfermera registrados:", datosEnfermera);
+            } else (
+                Swal.fire({
+                    icon: 'error',
+                    text: 'El rol seleccionado no es válido'
+                })
+            )
             Swal.fire({
                 icon: 'success',
                 text: 'La cuenta ha sido creada correctamente',
                 timer: 2000,
                 showConfirmButton: false
-            })
+            });
 
         } catch (error) {
             console.error("Error en el registro:", error);
             Swal.fire({ title: 'Error', icon: 'error', text: error.message });
         }
     };
+
+
+
+
 
     return (
         <form className="form-container" onSubmit={registroSubmit}>
@@ -365,25 +336,39 @@ export const RegisterForm = () => {
                     </select>
                 </div>
                 <InputField label="Teléfono" type="text" name="per_telefono" value={per_telefono} onChange={onInputChange} placeholder="3112345678" icon="fas fa-phone" />
-                <InputField label="Foto" type="file" name="per_foto" onChange={onInputChange} />
+                <InputField label="Foto" type="file" name="per_foto" onChange={onInputChange} accept="image/*" />
+
+                {validRegister() && (
+                    <div className="roles-assignment" >
+                        <FieldSelect label="Rol" name="rol_id" value={selectedRoles} onChange={handleRoleChange} />
+
+                        {/* Se activan los campos adicionales SOLO si el usuario tiene rol 4 (Paciente) */}
+                        {showExtraFields && (
+                            <div >
+                                <InputField label="Edad" type="text" name="pac_edad" value={pac_edad} onChange={onInputChange} placeholder="Edad" required />
+                                <InputField label="Peso" type="text" name="pac_peso" value={pac_peso} onChange={onInputChange} placeholder="Peso" required />
+                                <InputField label="Estatura" type="text" name="pac_talla" value={pac_talla} onChange={onInputChange} placeholder="Estatura" required />
+                                <InputField label="Régimen EPS" type="text" name="pac_regimen_eps" value={pac_regimen_eps} onChange={onInputChange} placeholder="Régimen EPS" required />
+                                <InputField label="EPS" type="text" name="pac_nombre_eps" value={pac_nombre_eps} onChange={onInputChange} placeholder="EPS" required />
+                                <InputField label="Grupo sanguíneo" type="text" name="pac_rh_grupo_sanguineo" value={pac_rh_grupo_sanguineo} onChange={onInputChange} placeholder="Grupo sanguíneo" required />
+                                <InputField label="Talla de camisa" type="text" name="pac_talla_camisa" value={pac_talla_camisa} onChange={onInputChange} placeholder="Talla de camisa" required />
+                                <InputField label="Talla de pantalón" type="text" name="pac_talla_pantalon" value={pac_talla_pantalon} onChange={onInputChange} placeholder="Talla de pantalón" required />
+                                <InputField label="Fecha de inicio" type="date" name="sp_fecha_inicio" value={sp_fecha_inicio} onChange={onInputChange} placeholder="aaaa-mm-dd" required />
+                                <InputField label="Fecha de fin" type="date" name="sp_fecha_fin" value={sp_fecha_fin} onChange={onInputChange} placeholder="aaaa-mm-dd" required />
+                            </div>
+                        )}
+                        {showModalEnfermera && (
+                            <div className="input-grid">
+                                <InputField label="Fecha inicio" type="date" name="sp_fecha_inicio" value={sp_fecha_inicio} onChange={onInputChange} placeholder="aaaa-mm-dd" required />
+                                <InputField label="Fecha fin" type="date" name="sp_fecha_fin" value={sp_fecha_fin} onChange={onInputChange} placeholder="aaaa-mm-dd" required />
+                                <InputField label="Codigo" type="cc" name="enf_codigo" value={enf_codigo} onChange={onInputChange} placeholder="1234567890" required />
+                            </div>
+                        )}
+                    </div>
+                )}
+
             </div>
             <button type="submit" className="register-button">Registrarme</button>
-
-            {/* {showAssignCard && selectedPersona?.per_id && (
-                <AssignCard
-                    selectedRoles={selectedRoles}
-                    setSelectedRoles={setSelectedRoles}
-                    selectedSedes={selectedSedes}
-                    setSelectedSedes={setSelectedSedes}
-                    fechaInicio={fechaInicio}
-                    setFechaInicio={setFechaInicio}
-                    fechaFin={fechaFin}
-                    setFechaFin={setFechaFin}
-                    assigning={assigning}
-                    handleAssignRole={handleAssignRole}
-                    handleAssignSedes={handleAssignSedes}
-                />
-            )} */}
             {showSelectRoles && selectedPersona && (
                 <SelectField
                     name="rol_id"
@@ -391,9 +376,9 @@ export const RegisterForm = () => {
                     onChange={(roles) => {
                         const rolesNumericos = roles.map(Number);
                         setSelectedRoles(rolesNumericos);
-            
+
                         const rolSeleccionado = rolesNumericos[0] || null;
-            
+
                         if (rolSeleccionado === 5) {
                             setShowModalEnfermera(true);
                             setShowModal(false);
@@ -404,7 +389,7 @@ export const RegisterForm = () => {
                     }}
                 />
             )}
-            
+
             {showModal && selectedPersona && (
                 <ModalRegistrarPaciente
                     datosIniciales={selectedPersona}
@@ -413,7 +398,7 @@ export const RegisterForm = () => {
                     setSelectedRoles={setSelectedRoles}
                 />
             )}
-            
+
             {showModalEnfermera && selectedPersona && (
                 <ModalEnfermera
                     datosInicial={selectedPersona}
@@ -423,7 +408,7 @@ export const RegisterForm = () => {
                     setSelectedRoles={setSelectedRoles}
                 />
             )}
-            
+
         </form>
     );
 };

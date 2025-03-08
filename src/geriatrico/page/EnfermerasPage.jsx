@@ -69,8 +69,8 @@ export const EnfermerasPage = () => {
                         <p className="error-message">{error}</p>
                     ) : (
                         enfermeras.length > 0 ? (
-                            enfermeras.map((enfermera) => (
-                                <div key={enfermera.enf_id} className="sede-card">
+                            enfermeras.map((enfermera, index) => (
+                                <div key={index} className="sede-card">
                                     <div className='sede-info'>
                                         <div className="full-name">{enfermera.nombre}</div>
                                         <div className="CC">{enfermera.enf_codigo}</div>

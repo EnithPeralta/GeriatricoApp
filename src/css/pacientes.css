@@ -121,6 +121,19 @@ h1 {
     justify-content: center;
 }
 
+.status-icon-paciente{
+    margin-bottom: 5px;
+    font-size: 20px;
+}
+
+.status-icon-paciente .activo{
+    color: #33B0D7;
+}
+
+.status-icon-paciente .inactivo{
+    color: #F05454;
+}
+
 .sede-icon i {
     font-size: 20px;
     color: #666;

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { usePaciente } from "../../hooks/usePaciente"; // Hook con funciones de pacientes
-import { useParams } from "react-router-dom";
 
 export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles }) => {
-    const { id } = useParams();
     const { obtenerDetallePacienteSede, registrarPaciente, actualizarDetallePaciente } = usePaciente();
+    const [esActualizacion, setEsActualizacion] = useState(false);
     const [datosPaciente, setDatosPaciente] = useState({
         per_id: datosIniciales?.per_id || "",
         pac_edad: "",
@@ -40,7 +39,10 @@ export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles 
                         sp_fecha_inicio: response.paciente.sp_fecha_inicio || "",
                         sp_fecha_fin: response.paciente.sp_fecha_fin || "",
                     }));
-
+    
+                    // 🔹 Agregar la propiedad tieneDatos para saber si es una actualización
+                    datosIniciales.tieneDatos = true;
+    
                     Swal.fire({
                         icon: "info",
                         text: "Este paciente ya tenía datos registrados. Se han cargado sus datos anteriores.",
@@ -50,6 +52,8 @@ export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles 
             });
         }
     }, [datosIniciales, selectedRoles]);
+    
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -67,10 +71,10 @@ export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles 
             });
             return;
         }
-
-        // Si ya hay edad cargada, significa que es una actualización
-        const esActualizacion = datosPaciente.pac_edad !== "";
-
+    
+        // Determinar si es un paciente nuevo o ya registrado
+        const esActualizacion = Boolean(datosIniciales?.per_id && datosIniciales?.tieneDatos);
+    
         if (esActualizacion) {
             console.log("🔄 Actualizando paciente:", datosPaciente);
             const response = await actualizarDetallePaciente(datosPaciente.per_id, datosPaciente);
@@ -89,6 +93,7 @@ export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles 
         } else {
             console.log("📤 Registrando nuevo paciente:", datosPaciente);
             const response = await registrarPaciente(datosPaciente);
+    
             if (response.success) {
                 Swal.fire({
                     icon: "success",
@@ -103,6 +108,7 @@ export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles 
             }
         }
     };
+    
 
     return (
         <div className="modal-overlay">
@@ -149,8 +155,9 @@ export const ModalRegistrarPaciente = ({ datosIniciales, onClose, selectedRoles 
                         <input className="modal-input" type="date" name="sp_fecha_fin" value={datosPaciente.sp_fecha_fin} onChange={handleChange} />
                     </div>
                     <button type="button" className="create" onClick={handleSubmit}>
-                        {datosPaciente.pac_edad ? "Actualizar Paciente" : "Registrar Paciente"}
+                        {esActualizacion ? "Actualizar Paciente" : "Registrar Paciente"}
                     </button>
+
                     <button type="button" className="cancel" onClick={onClose}>
                         Cerrar
                     </button>

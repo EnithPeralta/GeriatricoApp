@@ -95,6 +95,13 @@ export const PacientesPage = () => {
                                     className="sede-card"
                                     onClick={() => handleVerDetalle(paciente.per_id)} // Evento clic
                                 >
+                                    <div className="status-icon-paciente">
+                                        {paciente.activoSede ? (
+                                            <i className="fa-solid fa-circle-check activo"></i>
+                                        ) : (
+                                            <i className="fa-solid fa-circle-xmark inactivo"></i>
+                                        )}
+                                    </div>
                                     <div className="sede-info">
                                         <div className="full-name">{paciente.per_nombre}</div>
                                         <div className="CC">{paciente.per_documento}</div>
